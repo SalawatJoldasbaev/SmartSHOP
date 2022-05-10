@@ -1,0 +1,8 @@
+Other, Другой, Boshqa, Basqa
+Administrative, Административные, Ma'muriy, Administrativ
+Rent, Аренда, Ijara, Ijara
+Salary, Зарплата, Ish haqi, Is haqi
+Investments, Инвестиции, Investitsiyalar, Investitsiyalar
+Office, Офис, Ofis, Ofis
+Taxes, Налоги, Soliqlar, Saliqlar
+Household, Домашнее хозяйство, Maishiy, Uy xojalig'i
