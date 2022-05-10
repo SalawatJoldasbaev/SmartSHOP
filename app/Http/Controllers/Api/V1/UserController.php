@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -67,7 +68,7 @@ class UserController extends Controller
         return ApiResponse::success(data:$final);
     }
 
-    public function update(Request $request)
+    public function update(UserUpdateRequest $request)
     {
         $client_id = $request->client_id;
         try {

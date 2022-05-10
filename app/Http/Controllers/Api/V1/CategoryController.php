@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\CategoryUpdateRequest;
+use App\Models\Category;
 use App\Models\Forex;
 use App\Models\Product;
-use App\Models\Category;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use ProtoneMedia\LaravelCrossEloquentSearch\Search;
-
 
 class CategoryController extends Controller
 {
@@ -35,7 +35,7 @@ class CategoryController extends Controller
             'min_product' => $request->percents['min_product'],
         ]);
 
-        return ApiResponse::success(data: $category);
+        return ApiResponse::success(data:$category);
     }
 
     public function index(Request $request)
@@ -45,36 +45,28 @@ class CategoryController extends Controller
         if ($delete == true) {
             $categories = $categories->withTrashed();
         }
-        $categories = Search::new()->add($categories, 'name')
+        $categories = Search::new ()->add($categories, 'name')
             ->beginWithWildcard()
             ->search($request->search);
-        return ApiResponse::success(data: $categories);
+        return ApiResponse::success(data:$categories);
     }
 
-    public function update(Request $request)
+    public function update(CategoryUpdateRequest $request)
     {
         try {
             $category = Category::findOrFail($request->category_id);
-        } catch (\Throwable $th) {
+        } catch (\Throwable$th) {
             return ApiResponse::error('not found', 404);
         }
         $percents = $request->percents;
-        $data = [];
-        if (isset($percents['min'])) {
-            $data['min_percent'] = $percents['min'];
-        }
-        if (isset($percents['max'])) {
-            $data['max_percent'] = $percents['max'];
-        }
-        if (isset($percents['wholesale'])) {
-            $data['whole_percent'] = $percents['wholesale'];
-        }
-        if (isset($request->name)) {
-            $data['name'] = $request->name;
-        }
-        if (isset($request->name)) {
-            $data['min_product'] = $request->min_product;
-        }
+        $data = [
+            'min_percent' => $percents['min'],
+            'max_percent' => $percents['max'],
+            'whole_percent' => $percents['wholesale'],
+            'min_product' => $percents['min_product'],
+            'name' => $request->name,
+        ];
+
         $products = Product::where('category_id', $request->category_id)->get();
         $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
         foreach ($products as $product) {
@@ -118,7 +110,7 @@ class CategoryController extends Controller
             $product->update([
                 'min_price' => $min,
                 'max_price' => $max,
-                'whole_price' => $whole
+                'whole_price' => $whole,
             ]);
         }
         $category = $category->update($data);
