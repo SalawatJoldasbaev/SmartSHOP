@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use ProtoneMedia\LaravelCrossEloquentSearch\Search;
 
@@ -17,11 +17,11 @@ class UserController extends Controller
             'phone' => 'required|unique:users,phone',
             'type' => 'required',
             'tin' => 'required_if:type,Y|unique:users,tin|integer',
-            'about' => 'nullable'
+            'about' => 'nullable',
         ]);
 
         if ($validation->fails()) {
-            return ApiResponse::data(false, $validation->errors()->first(), code: 422);
+            return ApiResponse::data(false, $validation->errors()->first(), code:422);
         }
 
         $user = User::create([
@@ -30,12 +30,12 @@ class UserController extends Controller
             'type' => $request->type,
             'tin' => $request->type == 'Y' ? $request->tin : null,
             'balance' => 0,
-            'about' => $request->about
+            'about' => $request->about,
         ]);
 
-        return ApiResponse::success(data: [
-            'id' => $user->id
-        ], code: 201);
+        return ApiResponse::success(data:[
+            'id' => $user->id,
+        ], code:201);
     }
 
     public function index(Request $request)
@@ -47,7 +47,7 @@ class UserController extends Controller
             ->when($type, function ($query) use ($type) {
                 $query->where('type', $type);
             })->orderBy('balance');
-        $users = Search::new()->add($users, ['full_name', 'phone'])
+        $users = Search::new ()->add($users, ['full_name', 'phone'])
             ->beginWithWildcard()
             ->paginate(60)
             ->search($search);
@@ -57,14 +57,14 @@ class UserController extends Controller
             'last_page' => $users->lastPage(),
             'data' => [
                 'debt' => $debt->sum('balance'),
-                'clients' => []
+                'clients' => [],
             ],
         ];
 
         foreach ($users as $user) {
             $final['data']['clients'][] = $user;
         }
-        return ApiResponse::success(data: $final);
+        return ApiResponse::success(data:$final);
     }
 
     public function update(Request $request)
@@ -72,9 +72,15 @@ class UserController extends Controller
         $client_id = $request->client_id;
         try {
             $client = User::findOrFail($client_id);
-        } catch (\Throwable $th) {
+            try {
+                $this->authorize('update', $client);
+            } catch (\Throwable$th) {
+                return ApiResponse::error('This action is unauthorized.', 403);
+            }
+        } catch (\Throwable$th) {
             return ApiResponse::error('client not found', 404);
         }
+
         $client->update($request->all());
         return ApiResponse::success();
     }

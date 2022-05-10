@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1\Employee;
 
+use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\SetSalaryRequest;
+use App\Models\Employee;
 use App\Models\Salary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\V1\ApiResponse;
-use App\Http\Requests\SetSalaryRequest;
-use App\Models\Employee;
 
 class SalaryController extends Controller
 {
@@ -34,10 +34,10 @@ class SalaryController extends Controller
                     'flex' => $employee->flex,
                     'role' => $employee->role,
                 ],
-                'sum' => collect($value)->sum('salary')
+                'sum' => collect($value)->sum('salary'),
             ];
         }
-        return ApiResponse::success(data: $final);
+        return ApiResponse::success(data:$final);
     }
 
     public function monthly(Request $request)
@@ -56,27 +56,33 @@ class SalaryController extends Controller
             $final[] = [
                 'month' => $value[0]->month,
                 'year' => $value[0]->year,
-                'sum' => collect($value)->sum('salary')
+                'sum' => collect($value)->sum('salary'),
             ];
         }
 
-        return ApiResponse::success(data: $final);
+        return ApiResponse::success(data:$final);
     }
 
     public function setSalary(SetSalaryRequest $request)
     {
+        try {
+            $this->authorize('update', Employee::class);
+        } catch (\Throwable$th) {
+            return ApiResponse::error('This action is unauthorized.', 403);
+        }
+
         $employee_id = $request->employee_id;
         $everyone = $request->is_everyone ?? false;
         if ($everyone === true) {
             $employees = Employee::query()->update([
                 'salary' => $request->salary,
-                'flex' => $request->flex
+                'flex' => $request->flex,
             ]);
         } else {
             $employee = Employee::find($employee_id);
             $employee->update([
                 'salary' => $request->salary,
-                'flex' => $request->flex
+                'flex' => $request->flex,
             ]);
         }
         return ApiResponse::success();

@@ -19,6 +19,12 @@ class ProductController extends Controller
 {
     public function create(Request $request)
     {
+        try {
+            $this->authorize('create', Product::class);
+        } catch (\Throwable$th) {
+            return ApiResponse::error('This action is unauthorized.', 403);
+        }
+
         $validation = Validator::make($request->all(), [
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable',
@@ -48,6 +54,7 @@ class ProductController extends Controller
             'max_price' => $request->price_max,
             'whole_price' => $request->price_wholesale,
         ]);
+
         if (isset($request->warehouse)) {
             $code = Code::newCode();
             $basket = WarehouseBasket::create([
@@ -175,6 +182,12 @@ class ProductController extends Controller
 
     public function update(Request $request)
     {
+        try {
+            $this->authorize('update', Product::class);
+        } catch (\Throwable$th) {
+            return ApiResponse::error('This action is unauthorized.', 403);
+        }
+
         $validation = Validator::make($request->all(), [
             'category_id' => 'required|exists:categories,id',
             'name' => 'required',
@@ -212,6 +225,12 @@ class ProductController extends Controller
 
     public function delete($id)
     {
+        try {
+            $this->authorize('delete', Product::class);
+        } catch (\Throwable$th) {
+            return ApiResponse::error('This action is unauthorized.', 403);
+        }
+
         $product = Product::findOrFail($id)->delete();
         return ApiResponse::success();
     }

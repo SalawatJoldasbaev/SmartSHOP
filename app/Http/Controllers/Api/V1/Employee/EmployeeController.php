@@ -19,6 +19,12 @@ class EmployeeController extends Controller
     }
     public function register(Request $request)
     {
+        try {
+            $this->authorize('create', Employee::class);
+        } catch (\Throwable$th) {
+            return ApiResponse::error('This action is unauthorized.', 403);
+        }
+
         $validation = Validator::make($request->all(), [
             'phone' => 'required|unique:employees,phone',
             'avatar' => 'nullable',
@@ -83,6 +89,12 @@ class EmployeeController extends Controller
 
     public function update(Request $request)
     {
+        try {
+            $this->authorize('update', Employee::class);
+        } catch (\Throwable$th) {
+            return ApiResponse::error('This action is unauthorized.', 403);
+        }
+
         $validation = Validator::make($request->all(), [
             'employee_id' => 'required|exists:employees,id',
             'avatar' => 'nullable',

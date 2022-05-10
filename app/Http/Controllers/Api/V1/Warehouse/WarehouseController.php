@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1\Warehouse;
 
-
+use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Http\Controllers\Controller;
 use App\Models\Warehouse;
 use App\Src\WarehouseLogic;
 use Illuminate\Http\Request;
-use function PHPSTORM_META\map;
-
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\V1\ApiResponse;
 
 class WarehouseController extends Controller
 {
@@ -20,20 +17,19 @@ class WarehouseController extends Controller
     }
     public function create(Request $request)
     {
-
         $this->warehouseLogic->SetWarehouse($request);
         return ApiResponse::success();
     }
 
     public function index(Request $request)
     {
-        $warehouse = $this->warehouseLogic->getWarehouse(search: $request->search ?? null, category_id: $request->category_id);
-        return ApiResponse::success(data: $warehouse);
+        $warehouse = $this->warehouseLogic->getWarehouse(search:$request->search ?? null, category_id:$request->category_id);
+        return ApiResponse::success(data:$warehouse);
     }
     public function less(Request $request)
     {
-        $warehouse = $this->warehouseLogic->getWarehouse(search: $request->search ?? null, min_product: true, category_id: $request->category_id);
-        return ApiResponse::success(data: $warehouse);
+        $warehouse = $this->warehouseLogic->getWarehouse(search:$request->search ?? null, min_product:true, category_id:$request->category_id);
+        return ApiResponse::success(data:$warehouse);
     }
 
     public function costprice(Request $request)
@@ -52,6 +48,6 @@ class WarehouseController extends Controller
                 }
             }
         }
-        return ApiResponse::success(data: $final);
+        return ApiResponse::success(data:$final);
     }
 }
