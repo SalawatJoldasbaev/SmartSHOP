@@ -72,17 +72,20 @@
                     "id": "subitem4",
                     "label": "Расход",
                     "path": "/consumptions/consumption",
-                    "icon": "bx bx-cart-alt"
+                    "icon": "bx bx-cart-alt",
+                    "role": "ceo"
                 },{
                     "id": "subitem5",
                     "label": "Даход",
                     "path": "/consumptions/income",
-                    "icon": "bx bx-cart-alt"
+                    "icon": "bx bx-cart-alt",
+                    "role": "ceo"
                 },{
                     "id": "subitem6",
                     "label": "Чистая прибыль",
                     "path": "/casheir",
-                    "icon": "bx bx-cart-alt"
+                    "icon": "bx bx-cart-alt",
+                    "role": "ceo"
                 },{
                     "id": "subitem15",
                     "label": "Валюта",
@@ -170,7 +173,7 @@
     "total_income": "Общая сумма",
     "all": "Все",
     "qarz": "Долг",
-    "kirim": "Доход",
+    "kirim": "Приход",
     "qarz_muddati": "Срок долга",
     "total_price": "Общая сумма",
     "description": "Комментария",
@@ -258,7 +261,26 @@
     "delete": "Вы хотите удалить данные?",
     "deleted": "Данные удалены!",
     "yes": "Да",
-    "no": "Нет"
+    "no": "Нет",
+    "update_client": "Редактирование клиента",
+    "mahsulotni_tahrirlash": "Редактирование продукта",
+
+    "kirish": "Управляйте своим бизнесом с SmartSHOP",
+    "login": "Авторизоваться",
+
+    "select_client": "Выберите клиента",
+    "all_client": "Все клиенты",
+    "all_payment": "Все виды платежей",
+
+
+    "all_categories": "Все категории",
+    "paid_debt": "Оплаченные долги",
+
+    "money_mistaken": "Сумма платежа не соответствует сумме долга",
+    "remove__image": "Удалить изображение",
+    "tolangan_qarz": "Oплаченный долг",
+
+    "client": "Клиент"
 }
 
 

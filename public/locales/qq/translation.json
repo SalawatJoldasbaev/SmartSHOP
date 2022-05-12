@@ -72,17 +72,20 @@
                     "id": "subitem4",
                     "label": "Ǵárejetler",
                     "path": "/consumptions/consumption",
-                    "icon": "bx bx-cart-alt"
+                    "icon": "bx bx-cart-alt",
+                    "role": "ceo"
                 },{
                     "id": "subitem5",
                     "label": "Tabıslar",
                     "path": "/consumptions/income",
-                    "icon": "bx bx-cart-alt"
+                    "icon": "bx bx-cart-alt",
+                    "role": "ceo"
                 },{
                     "id": "subitem6",
                     "label": "Sap payda",
                     "path": "/casheir",
-                    "icon": "bx bx-cart-alt"
+                    "icon": "bx bx-cart-alt",
+                    "role": "ceo"
                 },{
                     "id": "subitem15",
                     "label": "Финанс",
@@ -119,6 +122,7 @@
     "main": "Bas bet",
     "clients": "Klientler",
     "sellers": "Satiwshilar",
+    "seller": "Satiwshi", 
     "categories": "Kategoriyalar",
     "products": "O'nimler",
     "offers": "Satiwlar",
@@ -135,7 +139,7 @@
     "about__client":"Klient haqqinda",
     "action": "Ha'reket",
     "search": "Izlew...",
-    "add__client": "Klient qosiw",
+    "add__client": "Paydalaniwshi qosiw",
     "save": "Saqlaw",
     
 
@@ -162,7 +166,7 @@
     "export": "Eksport ",
     "mahsulot_qoshish": "Ónim qosıw",
     "brend": "Brend",
-    "cost_price": "Ózine túser bahası",
+    "cost_price": "Kótere bahası ",
     "whole_price": "Optom bahası",
     "max_price": "Maksimium bahası",
     "min_price": "Minimum bahasi",
@@ -212,7 +216,7 @@
     "kuting": "Iltimas, biraz kútiń!",
     "xatolik": "Server menen qátelik bar!",
     "malumotni_togri_kiriting": "Iltimas, maǵlıwmatlardı tuwrı kiritiń!",
-    "malumotni_toliq_kiriting": "Iltimas, maǵlıwmatlardı qayta kiritiń!",
+    "malumotni_toliq_kiriting": "Iltimas, maǵlıwmatlardı toliq kiritiń!",
     "parol_yoki_login_xato": "Parol yamasa Login qáte!",
     "bosh_sahifaga_qaytish": "Bas betke qaytıw",
     "qayta_urinib_koring": "Jáne urınıp kóriń",
@@ -259,6 +263,24 @@
     "delete": "Mag'luwmatti o'shirmekshisizbe?",
     "deleted": "Mag'luwmat o'shirildi!",
     "yes": "Awa",
-    "no": "Yaq"
+    "no": "Yaq",
+    "update_client": "Paydalaniwshini o'zgertiw",
+    "mahsulotni_tahrirlash": "O'nimdi o'zgertiw",
+
+
+    "kirish": "SmartSHOP penen o'z bisnesin'izdi basqarin'",
+    "login": "Kiriw",
+
+    "select_client": "Qariydardi tan'lan'",
+    "all_client": "Ba'rshe qariydarlar",
+    "all_payment": "Ba'rshe tu'rdegi to'lemler",
+    "all_categories": "Ba'rshe kategoriyalar",
+    "paid_debt": "To'lengen qariz",
+    "money_mistaken": "Pul jeterli emes! To'lem tu'rin o'zgertin'!",
+    "remove__image": "Su'wretti o'shiriw",
+
+    "tolangan_qarz": "To'lengen qariz",
+
+    "client": "Aliwshi"
 
 }

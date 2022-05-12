@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Basket;
-use App\Models\Cashier;
 use App\Models\Order;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -20,12 +20,12 @@ class OrderSeeder extends Seeder
         $basket = Basket::create([
             'user_id' => 2,
             'employee_id' => 1,
-            'card' => 4500000,
-            'cash' => 3500000,
+            'card' => 5000,
+            'cash' => 0,
             'debt' => [
-                'debt' => 11800000,
-                'paid' => 0,
-                'remaining' => 11800000,
+                'debt' => 10000,
+                'paid' => 5000,
+                'remaining' => 5000,
             ],
             'term' => Carbon::today()->add(1, 'day'),
             'description' => 'qoyishay',
@@ -36,16 +36,8 @@ class OrderSeeder extends Seeder
                 'user_id' => 2,
                 'product_id' => 1,
                 'unit_id' => 1,
-                'count' => 2,
-                'price' => 4500000,
-            ],
-            [
-                'basket_id' => $basket->id,
-                'user_id' => 2,
-                'product_id' => 2,
-                'unit_id' => 1,
-                'count' => 2,
-                'price' => 5400000,
+                'count' => 1,
+                'price' => 15000,
             ],
         ];
 
@@ -57,15 +49,8 @@ class OrderSeeder extends Seeder
             'count',
             'price',
         ]);
-        $balance = [
-            'date' => Carbon::today(),
-            'balance' => [
-                'sum' => 8000000,
-                'card' => 4500000,
-                'cash' => 3500000,
-            ],
-            'profit' => -7600000,
-        ];
-        Cashier::create($balance);
+        User::find(2)->update([
+            'balance' => -5000,
+        ]);
     }
 }

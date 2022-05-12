@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\Api\V1\Order;
 
-use Carbon\Carbon;
-use App\Models\User;
+use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\OrderRequest;
+use App\Models\Basket;
+use App\Models\Cashier;
 use App\Models\Forex;
 use App\Models\Order;
-use App\Models\Basket;
-use App\Models\Salary;
-use App\Models\Cashier;
 use App\Models\Product;
+use App\Models\Salary;
+use App\Models\User;
 use App\Models\Warehouse;
-use Illuminate\Http\Request;
-use App\Http\Requests\OrderRequest;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\V1\ApiResponse;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -35,7 +34,7 @@ class OrderController extends Controller
                 $cost_price += ($product->cost_price['price'] * $order['count']);
             }
             $warehouse = $warehouses->where('product_id', $order['product_id'])->first();
-            if ($warehouse->count - $order['count'] > 0) {
+            if ($warehouse->count - $order['count'] >= 0) {
                 $warehouse->count -= $order['count'];
                 $set_orders->push([
                     'basket_id' => null,
@@ -43,12 +42,12 @@ class OrderController extends Controller
                     'product_id' => $order['product_id'],
                     'unit_id' => $order['unit_id'],
                     'count' => $order['count'],
-                    'price' => json_encode($order['price'])
+                    'price' => json_encode($order['price']),
                 ]);
             } else {
-                return ApiResponse::error('product is not enough', data: [
+                return ApiResponse::error('product is not enough', data:[
                     'id' => $order['product_id'],
-                    'name' => $warehouse->product->name
+                    'name' => $warehouse->product->name,
                 ]);
             }
         }
@@ -60,10 +59,10 @@ class OrderController extends Controller
             'debt' => [
                 'debt' => $request->debt,
                 'paid' => 0,
-                'remaining' => $request->debt
+                'remaining' => $request->debt,
             ],
             'term' => $request->term,
-            'description' => $request->description
+            'description' => $request->description,
         ]);
         $sum = $request->card + $request->cash;
         $set_orders = $set_orders->map(function ($item, $key) use ($basket) {
@@ -92,7 +91,7 @@ class OrderController extends Controller
                     'cash' => $request->cash,
                     'sum' => $sum,
                 ],
-                'profit' => $sum - $cost_price
+                'profit' => $sum - $cost_price,
             ]);
         } else {
             $cashier->update([
@@ -101,20 +100,20 @@ class OrderController extends Controller
                     'cash' => $cashier->balance['cash'] + $request->cash,
                     'sum' => $cashier->balance['sum'] + $sum,
                 ],
-                'profit' => $cashier->profit + ($sum - $cost_price)
+                'profit' => $cashier->profit + ($sum - $cost_price),
             ]);
         }
         $salary = Salary::where('date', $date)->where('employee_id', $request->user()->id)->first();
         $flex = $request->user()->flex;
         if ($salary) {
             $salary->update([
-                'salary' => $salary->salary + ((($sum + $request->debt) * $flex) / 100)
+                'salary' => $salary->salary + ((($sum + $request->debt) * $flex) / 100),
             ]);
         } else {
             Salary::create([
                 'employee_id' => $request->user()->id,
                 'date' => $date,
-                'salary' => (($sum + $request->debt) * $flex) / 100
+                'salary' => (($sum + $request->debt) * $flex) / 100,
             ]);
         }
         if ($request->debt > 0) {
@@ -130,25 +129,25 @@ class OrderController extends Controller
                 'debt' => $basket->debt['debt'],
                 'paid_debt' => $basket->debt['paid'],
                 'remaining' => $basket->debt['remaining'],
-                'sum' => $basket->card + $basket->cash + $basket->debt['debt']
+                'sum' => $basket->card + $basket->cash + $basket->debt['debt'],
             ],
             'term' => $basket->term,
             'description' => $basket->description,
             'user' => [
                 'id' => $basket->user_id,
                 'name' => $basket->user->full_name,
-                'phone' => $basket->user->phone ?? 99
+                'phone' => $basket->user->phone ?? 99,
             ],
             'employee' => [
                 'id' => $basket->employee_id,
                 'name' => $basket->employee->name,
-                'role' => $basket->employee->role
+                'role' => $basket->employee->role,
             ],
             'orders' => [],
             'created_at' => date_format($basket->created_at, 'Y-m-d H:i:s'),
             'qr_link' => route('qrcode', [
                 'type' => 'basket',
-                'uuid' => $basket->uuid
+                'uuid' => $basket->uuid,
             ]),
         ];
         $orders = $basket->orders;
@@ -160,9 +159,9 @@ class OrderController extends Controller
                 'brand' => $order->product->brand,
                 'count' => $order->count,
                 'unit_id' => $order->unit_id,
-                'price' => $order->price
+                'price' => $order->price,
             ];
         }
-        return ApiResponse::success(data: $final);
+        return ApiResponse::success(data:$final);
     }
 }

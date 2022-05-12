@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1\Order;
 
-use App\Http\Controllers\Api\V1\ApiResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\ReturnOrderRequest;
-use App\Models\Basket;
-use App\Models\Cashier;
 use App\Models\Forex;
 use App\Models\Order;
+use App\Models\Basket;
+use App\Models\Cashier;
 use App\Models\Product;
 use App\Models\Warehouse;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ReturnOrderRequest;
+use App\Http\Controllers\Api\V1\ApiResponse;
 
 class ReturnOrderController extends Controller
 {
@@ -20,24 +20,23 @@ class ReturnOrderController extends Controller
         $orders = $request->orders;
         $payment_type = $request->payment_type; //card, debt, cash, paid_debt
         $basket = Basket::find($basket_id);
+        $user = $basket->user;
         $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
         $cost_price = 0;
         $price = 0;
+        $balance = [
+            'sum' => 0,
+        ];
         foreach ($orders as $order) {
             $order_id = $order['order_id'];
             $count = $order['count'];
             $order = Order::where('id', $order_id)
                 ->where('basket_id', $basket_id)
                 ->first();
-
-            if (!$order) {
-                return ApiResponse::error('order not found', 404);
-            }
             if ($order->count - $count < 0) {
                 return ApiResponse::error('An error occurred', 409);
             }
             $product = Product::where('id', $order->product_id)->withTrashed()->first();
-
             if ($product->cost_price['currency_id'] == 2) {
                 $cost_price += (($product->cost_price['price'] * $usdToUzs->rate) * $count);
             } else {
@@ -45,9 +44,6 @@ class ReturnOrderController extends Controller
             }
             $price += $count * $order->price;
         }
-        $balance = [
-            'sum' => 0,
-        ];
         foreach ($payment_type as $item) {
             if ($item == 'debt') {
                 $balance['remaining'] = 0;
@@ -75,6 +71,9 @@ class ReturnOrderController extends Controller
         }
         $temp = 0;
         foreach ($payment_type as $item) {
+            if ($balance[$item] == 0) {
+                continue;
+            }
             if ($balance[$item] < $price) {
                 $price -= $balance[$item];
                 $balance[$item] = 0;
@@ -97,7 +96,6 @@ class ReturnOrderController extends Controller
         if (isset($temp_balance['paid_debt'])) {
             $temp_balance['paid_debt'] -= $balance['paid_debt'];
         }
-
         $cashier = Cashier::orderBy('id', 'desc')->first();
         $cashierBalance = $cashier->balance;
         $cashierBalance['card'] -= ($temp_balance['card'] ?? 0);
@@ -131,13 +129,20 @@ class ReturnOrderController extends Controller
         if (isset($temp_balance['paid_debt'])) {
             $debt['debt'] -= $temp_balance['paid_debt'];
             $debt['paid'] -= $temp_balance['paid_debt'];
-            $debt['remaining'] -= $temp_balance['paid_debt'];
         }
         $basket->update([
             'card' => $basket->card - ($temp_balance['card'] ?? 0),
             'cash' => $basket->cash - ($temp_balance['cash'] ?? 0),
             'debt' => $debt,
         ]);
+        if (isset($temp_balance['paid_debt']) or isset($temp_balance['debt'])) {
+            $debt_user = $user->balance + $temp_balance['debt'];
+            $user->update([
+                'balance' => $debt_user,
+            ]);
+
+        }
+
         return ApiResponse::success();
     }
 }
