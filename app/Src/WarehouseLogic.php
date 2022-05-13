@@ -2,13 +2,13 @@
 
 namespace App\Src;
 
-use Carbon\Carbon;
 use App\Models\Code;
+use App\Models\Forex;
+use App\Models\Product;
 use App\Models\Warehouse;
-use App\Models\WarehouseOrder;
 use App\Models\WarehouseBasket;
-use ProtoneMedia\LaravelCrossEloquentSearch\Search;
-
+use App\Models\WarehouseOrder;
+use Carbon\Carbon;
 
 class WarehouseLogic
 {
@@ -17,7 +17,7 @@ class WarehouseLogic
         $date = Carbon::today()->format('Y-m-d');
         $basket = WarehouseBasket::create([
             'employee_id' => $data->user()->id,
-            'date' => $date
+            'date' => $date,
         ]);
         $data = $data->all();
         foreach ($data as $product) {
@@ -25,14 +25,56 @@ class WarehouseLogic
             $codes = $warehouse->codes ?? [];
             $code = Code::newCode();
             $codes[$code] = $product['count'];
+            $productModel = Product::find($product['product_id']);
+            $category = $productModel->category;
+            $cost = $product['price'];
             $updated_count = ($warehouse->count ?? 0) + $product['count'];
+            $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
 
             $warehouseOrder = WarehouseOrder::create([
                 'warehouse_basket_id' => $basket->id,
                 'product_id' => $product['product_id'],
                 'unit_id' => $product['unit_id'],
                 'count' => $product['count'],
-                'code' => $code
+                'code' => $code,
+            ]);
+
+            $min = $productModel['min_price'];
+            if ($min['currency_id'] == 2) {
+                $min['price'] = $cost['price'] * $category['min_percent'] / 100 + $cost['price'];
+            } else {
+                if ($cost['currency_id'] == 2) {
+                    $min['price'] = floor(((($cost['price'] * $category['min_percent'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
+                } else {
+                    $min['price'] = $cost['price'] * $category['min_percent'] / 100 + $cost['price'];
+                }
+            }
+            $max = $productModel['max_price'];
+            if ($max['currency_id'] == 2) {
+                $max['price'] = $cost['price'] * $category['max_percent'] / 100 + $cost['price'];
+            } else {
+                if ($cost['currency_id'] == 2) {
+                    $max['price'] = floor(((($cost['price'] * $category['max_percent'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
+                } else {
+                    $max['price'] = $cost['price'] * $category['max_percent'] / 100 + $cost['price'];
+                }
+            }
+            $whole = $productModel['whole_price'];
+            if ($whole['currency_id'] == 2) {
+                $whole['price'] = $cost['price'] * $category['whole_percent'] / 100 + $cost['price'];
+            } else {
+                if ($cost['currency_id'] == 2) {
+                    $whole['price'] = floor(((($cost['price'] * $category['whole_percent'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
+                } else {
+                    $whole['price'] = $cost['price'] * $category['whole_percent'] / 100 + $cost['price'];
+                }
+            }
+
+            $productModel->update([
+                'cost_price' => $cost,
+                'min_price' => $min,
+                'max_price' => $max,
+                'whole_price' => $whole,
             ]);
 
             $createCode = Code::create([
@@ -45,10 +87,10 @@ class WarehouseLogic
             if ($warehouse and $date == $warehouse->date) {
                 $warehouse->update([
                     'codes' => $codes,
-                    'count' => $updated_count
+                    'count' => $updated_count,
                 ]);
                 $createCode->update([
-                    'warehouse_id' => $warehouse->id
+                    'warehouse_id' => $warehouse->id,
                 ]);
             } else {
                 $new_warehouse = Warehouse::create([
@@ -57,13 +99,13 @@ class WarehouseLogic
                     'date' => $date,
                     'active' => true,
                     'codes' => $codes,
-                    'count' => $updated_count
+                    'count' => $updated_count,
                 ]);
                 $createCode->update([
-                    'warehouse_id' => $new_warehouse->id
+                    'warehouse_id' => $new_warehouse->id,
                 ]);
                 $warehouse?->update([
-                    'active' => false
+                    'active' => false,
                 ]);
             }
         }
@@ -110,7 +152,7 @@ class WarehouseLogic
                 'unit' => [
                     'id' => $warehouse->unit->id,
                     'name' => $warehouse->unit->name,
-                    'code' => $warehouse->unit->unit
+                    'code' => $warehouse->unit->unit,
                 ],
                 'date' => $warehouse->date,
             ];
