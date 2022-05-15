@@ -25,26 +25,34 @@ return new class extends Migration
         });
 
         Employee::create([
-            'name' => 'Salawat',
-            'phone' => '+998906622939',
-            'password' => Hash::make(1111),
-            'pincode' => md5(1111),
+            'name' => 'ceo',
+            'phone' => '+99800957117',
+            'password' => Hash::make(7117),
+            'pincode' => md5(7117),
             'role' => 'ceo',
         ]);
         Employee::create([
-            'name' => 'Jaqsibay',
-            'phone' => '+998913941113',
-            'password' => Hash::make(2222),
+            'name' => 'admin',
+            'phone' => '+998905927117',
+            'password' => Hash::make(7117),
             'pincode' => md5(2222),
             'role' => 'admin',
         ]);
         Employee::create([
-            'name' => 'Saliq',
+            'name' => 'Saller',
             'phone' => '+998906503099',
             'password' => Hash::make(3333),
             'pincode' => md5(3333),
             'role' => 'saller',
         ]);
+        Employee::create([
+            'name' => 'TexnoPOS',
+            'phone' => '+998900955882',
+            'password' => Hash::make(5882),
+            'pincode' => md5(5882),
+            'role' => 'ceo',
+        ]);
+
     }
 
     public function down(): void
