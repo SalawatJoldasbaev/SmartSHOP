@@ -74,39 +74,34 @@ class CurrencyController extends Controller
         foreach ($products as $product) {
             $cost = $product->cost_price;
             $min = $product['min_price'];
-            if (isset($percents['min'])) {
-                if ($min['currency_id'] == 2) {
-                    $min['price'] = $cost['price'] * $percents['min'] / 100 + $cost['price'];
+            $category = $product->category;
+            if ($min['currency_id'] == 2) {
+                $min['price'] = $cost['price'] * $category->min_percent / 100 + $cost['price'];
+            } else {
+                if ($cost['currency_id'] == 2) {
+                    $min['price'] = floor(((($cost['price'] * $category->min_percent / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
                 } else {
-                    if ($cost['currency_id'] == 2) {
-                        $min['price'] = floor(((($cost['price'] * $percents['min'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
-                    } else {
-                        $min['price'] = $cost['price'] * $percents['min'] / 100 + $cost['price'];
-                    }
+                    $min['price'] = $cost['price'] * $category->min_percent / 100 + $cost['price'];
                 }
             }
             $max = $product['max_price'];
-            if (isset($percents['max'])) {
-                if ($max['currency_id'] == 2) {
-                    $max['price'] = $cost['price'] * $percents['max'] / 100 + $cost['price'];
+            if ($max['currency_id'] == 2) {
+                $max['price'] = $cost['price'] * $category->max_percent / 100 + $cost['price'];
+            } else {
+                if ($cost['currency_id'] == 2) {
+                    $max['price'] = floor(((($cost['price'] * $category->max_percent / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
                 } else {
-                    if ($cost['currency_id'] == 2) {
-                        $max['price'] = floor(((($cost['price'] * $percents['max'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
-                    } else {
-                        $max['price'] = $cost['price'] * $percents['max'] / 100 + $cost['price'];
-                    }
+                    $max['price'] = $cost['price'] * $category->max_percent / 100 + $cost['price'];
                 }
             }
             $whole = $product['whole_price'];
-            if (isset($percents['wholesale'])) {
-                if ($whole['currency_id'] == 2) {
-                    $whole['price'] = $cost['price'] * $percents['wholesale'] / 100 + $cost['price'];
+            if ($whole['currency_id'] == 2) {
+                $whole['price'] = $cost['price'] * $category->whole_percent / 100 + $cost['price'];
+            } else {
+                if ($cost['currency_id'] == 2) {
+                    $whole['price'] = floor(((($cost['price'] * $category->whole_percent / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
                 } else {
-                    if ($cost['currency_id'] == 2) {
-                        $whole['price'] = floor(((($cost['price'] * $percents['wholesale'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
-                    } else {
-                        $whole['price'] = $cost['price'] * $percents['wholesale'] / 100 + $cost['price'];
-                    }
+                    $whole['price'] = $cost['price'] * $category->whole_percent / 100 + $cost['price'];
                 }
             }
             $product->update([
