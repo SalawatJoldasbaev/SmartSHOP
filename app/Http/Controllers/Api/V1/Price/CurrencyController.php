@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use App\Models\Forex;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -66,6 +67,52 @@ class CurrencyController extends Controller
         } else {
             $currency->update([
                 'rate' => $rate,
+            ]);
+        }
+        $products = Product::all();
+        $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
+        foreach ($products as $product) {
+            $cost = $product->cost_price;
+            $min = $product['min_price'];
+            if (isset($percents['min'])) {
+                if ($min['currency_id'] == 2) {
+                    $min['price'] = $cost['price'] * $percents['min'] / 100 + $cost['price'];
+                } else {
+                    if ($cost['currency_id'] == 2) {
+                        $min['price'] = floor(((($cost['price'] * $percents['min'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
+                    } else {
+                        $min['price'] = $cost['price'] * $percents['min'] / 100 + $cost['price'];
+                    }
+                }
+            }
+            $max = $product['max_price'];
+            if (isset($percents['max'])) {
+                if ($max['currency_id'] == 2) {
+                    $max['price'] = $cost['price'] * $percents['max'] / 100 + $cost['price'];
+                } else {
+                    if ($cost['currency_id'] == 2) {
+                        $max['price'] = floor(((($cost['price'] * $percents['max'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
+                    } else {
+                        $max['price'] = $cost['price'] * $percents['max'] / 100 + $cost['price'];
+                    }
+                }
+            }
+            $whole = $product['whole_price'];
+            if (isset($percents['wholesale'])) {
+                if ($whole['currency_id'] == 2) {
+                    $whole['price'] = $cost['price'] * $percents['wholesale'] / 100 + $cost['price'];
+                } else {
+                    if ($cost['currency_id'] == 2) {
+                        $whole['price'] = floor(((($cost['price'] * $percents['wholesale'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
+                    } else {
+                        $whole['price'] = $cost['price'] * $percents['wholesale'] / 100 + $cost['price'];
+                    }
+                }
+            }
+            $product->update([
+                'min_price' => $min,
+                'max_price' => $max,
+                'whole_price' => $whole,
             ]);
         }
         return ApiResponse::success();
