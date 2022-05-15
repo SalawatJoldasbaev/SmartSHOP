@@ -26,7 +26,7 @@ return new class extends Migration
 
         Employee::create([
             'name' => 'ceo',
-            'phone' => '+99800957117',
+            'phone' => '+998900957117',
             'password' => Hash::make(7117),
             'pincode' => md5(7117),
             'role' => 'ceo',
