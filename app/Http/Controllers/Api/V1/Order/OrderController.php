@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Order;
 
 use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Http\Controllers\Api\V1\Price\PaymentController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderRequest;
 use App\Models\Basket;
@@ -14,6 +15,7 @@ use App\Models\Salary;
 use App\Models\User;
 use App\Models\Warehouse;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
@@ -25,16 +27,22 @@ class OrderController extends Controller
         $orders = $request->orders;
         $warehouses = Warehouse::active()->get();
         $set_orders = collect([]);
+        $price = 0;
+        $card = $request->card;
+        $cash = $request->cash;
+
+        $sum = $card + $cash;
         $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
         foreach ($orders as $order) {
             $product = Product::find($order['product_id']);
+            $price += $order['count'] * $order['price'];
+            $warehouse = $warehouses->where('product_id', $order['product_id'])->first();
             if ($product->cost_price['currency_id'] == 2) {
                 $cost_price += (($product->cost_price['price'] * $usdToUzs->rate) * $order['count']);
             } else {
                 $cost_price += ($product->cost_price['price'] * $order['count']);
             }
-            $warehouse = $warehouses->where('product_id', $order['product_id'])->first();
-            if ($warehouse->count - $order['count'] >= 0) {
+            if ($warehouse->count - $order['count'] > 0) {
                 $warehouse->count -= $order['count'];
                 $set_orders->push([
                     'basket_id' => null,
@@ -42,7 +50,7 @@ class OrderController extends Controller
                     'product_id' => $order['product_id'],
                     'unit_id' => $order['unit_id'],
                     'count' => $order['count'],
-                    'price' => json_encode($order['price']),
+                    'price' => $order['price'],
                 ]);
             } else {
                 return ApiResponse::error('product is not enough', data:[
@@ -51,11 +59,46 @@ class OrderController extends Controller
                 ]);
             }
         }
+        $user = User::find($user_id);
+        if ($request->debt > 0) {
+            $user->balance -= $request->debt;
+            $user->save();
+        } elseif ($sum - $price <= 500) {
+            $remaining_sum = [
+                'cash'=> 0,
+                'card'=> 0,
+            ];
+            $copy_price = $price;
+            $basket = Basket::where('user_id', $user->id)->where('debt->remaining', '>', 0)->first();
+            if ($basket) {
+                $copy_price -= $card;
+                if($copy_price < 0){
+                    $card += $copy_price;
+                    $remaining_sum['card'] = abs($copy_price);
+                }
+                $copy_price -= $cash;
+                if($copy_price < 0){
+                    $cash += $copy_price;
+                    $remaining_sum['cash'] = abs($copy_price);
+                }
+                $payment = new PaymentController();
+                $payment->paidDebt(new Request([
+                    'employee_id'=> $request->user()->id,
+                    'basket_id' => $basket->id,
+                    'cash' => $remaining_sum['cash'],
+                    'card' => $remaining_sum['card'],
+                ]));
+            }
+            $user->balance += $sum - $price;
+            $user->save();
+        } elseif ($sum - $price > 500) {
+            return ApiResponse::error('incorrect sum', 409);
+        }
         $basket = Basket::create([
             'user_id' => $user_id,
             'employee_id' => $employee->id,
-            'card' => $request->card,
-            'cash' => $request->cash,
+            'card' => $card,
+            'cash' => $cash,
             'debt' => [
                 'debt' => $request->debt,
                 'paid' => 0,
@@ -64,7 +107,6 @@ class OrderController extends Controller
             'term' => $request->term,
             'description' => $request->description,
         ]);
-        $sum = $request->card + $request->cash;
         $set_orders = $set_orders->map(function ($item, $key) use ($basket) {
             $item['basket_id'] = $basket->id;
             return $item;
@@ -87,8 +129,8 @@ class OrderController extends Controller
             $cashier = Cashier::create([
                 'date' => $date,
                 'balance' => [
-                    'card' => $request->card,
-                    'cash' => $request->cash,
+                    'card' => $card,
+                    'cash' => $cash,
                     'sum' => $sum,
                 ],
                 'profit' => $sum - $cost_price,
@@ -96,8 +138,8 @@ class OrderController extends Controller
         } else {
             $cashier->update([
                 'balance' => [
-                    'card' => $cashier->balance['card'] + $request->card,
-                    'cash' => $cashier->balance['cash'] + $request->cash,
+                    'card' => $cashier->balance['card'] + $card,
+                    'cash' => $cashier->balance['cash'] + $cash,
                     'sum' => $cashier->balance['sum'] + $sum,
                 ],
                 'profit' => $cashier->profit + ($sum - $cost_price),
@@ -116,11 +158,7 @@ class OrderController extends Controller
                 'salary' => (($sum + $request->debt) * $flex) / 100,
             ]);
         }
-        if ($request->debt > 0) {
-            $user = User::find($user_id);
-            $user->balance -= $request->debt;
-            $user->save();
-        }
+
         $final = [
             'id' => $basket->id,
             'amount' => [

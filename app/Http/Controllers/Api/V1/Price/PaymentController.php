@@ -23,18 +23,30 @@ class PaymentController extends Controller
         $orders = $basket->orders;
         $debt = $basket->debt;
         $cost_price = 0;
+        $remaining_sum = [
+            'card'=> 0,
+            'cash'=> 0,
+        ];
         $paid_sum = $basket->cash + $basket->card + $basket->debt['paid'];
         $sum = $card + $cash;
-        if ($debt['remaining'] < $sum) {
+        if($sum - $debt['remaining'] > 500){
             return ApiResponse::error('There is no extra charge', 409);
         }
         if ($card) {
             $debt['remaining'] -= $card;
             $debt['paid'] += $card;
+            if ($debt['remaining'] < 0) {
+                $remaining_sum['card'] = abs($debt['remaining']);
+                $card +=$debt['remaining'];
+            }
         }
         if ($cash) {
             $debt['remaining'] -= $cash;
             $debt['paid'] += $cash;
+            if ($debt['remaining'] < 0) {
+                $remaining_sum['cash'] = abs($debt['remaining']);
+                $cash += $debt['remaining'];
+            }
         }
         if ($debt['remaining'] < 0) {
             $debt['remaining'] = 0;
@@ -56,7 +68,7 @@ class PaymentController extends Controller
         $balance['sum'] += $sum;
         PaymentHistory::create([
             'basket_id' => $basket->id,
-            'employee_id' => $request->user()->id,
+            'employee_id' => $request->user()->id ?? $request->employee_id,
             'user_id' => $basket->user_id,
             'amount_paid' => [
                 'card' => $card,
@@ -64,8 +76,19 @@ class PaymentController extends Controller
             ],
             'paid_time' => Carbon::now(),
         ]);
-        $user = User::find($basket->user_id);
-        $user->balance += $sum;
+        if(array_sum($remaining_sum) > 0){
+            $remaining_basket = Basket::where('user_id', $basket->user_id)->where('debt->remaining', '>', 0)->whereNot('id', $basket->id)->first();
+            if ($remaining_basket) {
+                $this->paidDebt(new Request([
+                    'employee_id'=> $request->user()->id,
+                    'basket_id' => $remaining_basket->id,
+                    'cash' => $remaining_sum['cash'],
+                    'card' => $remaining_sum['card'],
+                ]));
+            }
+        }
+        $user = $basket->user;
+        $user->balance += $sum - $debt['remaining'];
         $user->save();
 
         $profit = $paid_sum - $cost_price;
