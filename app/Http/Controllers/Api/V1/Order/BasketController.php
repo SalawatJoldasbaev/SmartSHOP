@@ -116,7 +116,7 @@ class BasketController extends Controller
 
     public function basketOrders(Request  $request)
     {
-        try {
+        try{
             $basket_id = $request->basket_id;
             $uuid = $request->uuid;
             if (!$basket_id and $uuid) {
