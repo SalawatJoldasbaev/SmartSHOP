@@ -119,7 +119,7 @@ class WarehouseLogic
                 $query->where('category_id', $category_id);
             }
             $query->where('name', 'like', '%' . $search . '%');
-        })->paginate(50);
+        })->paginate(30);
         $final = [
             'current_page' => $warehouses->currentPage(),
             'per_page' => $warehouses->perPage(),
@@ -128,9 +128,6 @@ class WarehouseLogic
         ];
         foreach ($warehouses as $warehouse) {
             $product = $warehouse->product;
-            if (is_null($product)) {
-                continue;
-            }
             $category = $product?->category;
             $temp = [
                 'product' => [

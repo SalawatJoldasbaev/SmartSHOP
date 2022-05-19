@@ -91,21 +91,18 @@ class ProductController extends Controller
         $search = $request->search;
         $products = Product::when($category_id, function ($query) use ($category_id) {
             $query->where('category_id', $category_id);
+        })->when($search, function ($query) use ($search){
+            if ($search[0] == '#') {
+                $search = str_replace('#', '', $search);
+                $query->where('id', $search);
+            }else{
+                $query->where('name', 'like', '%' . $search . '%');
+            }
         })->orderBy('id', 'desc');
         if ($delete) {
             $products = $products->withTrashed();
         }
-        if (isset($search[0]) and $search[0] == '#') {
-            $search = str_replace('#', '', $search);
-            $products = Search::new ()->add($products, 'id')
-                ->paginate(30)
-                ->search($search);
-        } else {
-            $products = Search::new ()->add($products, 'name')
-                ->beginWithWildcard()
-                ->paginate(30)
-                ->search($search);
-        }
+        $products = $products->paginate(30);
         $final = [
             'current_page' => $products->currentPage(),
             'per_page' => $products->perPage(),

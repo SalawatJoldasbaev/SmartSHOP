@@ -66,7 +66,7 @@ class CategoryController extends Controller
             'min_product' => $percents['min_product'],
             'name' => $request->name,
         ];
-
+        
         $products = Product::where('category_id', $request->category_id)->get();
         $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
         foreach ($products as $product) {
