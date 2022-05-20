@@ -76,7 +76,7 @@
                     "role": "ceo"
                 },{
                     "id": "subitem5",
-                    "label": "Даход",
+                    "label": "Доход",
                     "path": "/consumptions/income",
                     "icon": "bx bx-cart-alt",
                     "role": "ceo"
@@ -155,10 +155,10 @@
     "oluvchi_haqida": "О клиенте",
     "yangi_oluvchi_qoshish": "Добавить покупателя",
     "yangi_sotuvchi_qoshish": "Добавить сотрудника",
-    "ulgurji_foiz": "Оптовая процент",
-    "minimum_foiz": "Минимальная процент",
-    "maksumum_foiz": "Макстимальная процент",
-    "minimum_mahsulot": "Минимальная количества",
+    "ulgurji_foiz": "Оптовый процент",
+    "minimum_foiz": "Минимальный процент",
+    "maksumum_foiz": "Максимальный процент",
+    "minimum_mahsulot": "Минимальное количество",
     "kategoriya_qoshish": "Добавить категорию",
     "import": "Импорт",
     "export": "Экспорт ",
