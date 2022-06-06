@@ -38,7 +38,7 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
             ]);
         }
         //warehouse_count
-        $product = Product::find(str_replace('#', '', $data['code']));
+        $product = Product::where('name', $data['name'])->first();
         if (!$product) {
             $max = Currency::where('code', $data['price_max_currency'])->first();
             $wholesale = Currency::where('code', $data['wholesale_price_currency'])->first();
