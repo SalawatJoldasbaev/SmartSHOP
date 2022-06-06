@@ -42,7 +42,7 @@ class OrderController extends Controller
             } else {
                 $cost_price += ($product->cost_price['price'] * $order['count']);
             }
-            if ($warehouse->count - $order['count'] > 0) {
+            if ($warehouse->count - $order['count'] >= 0) {
                 $warehouse->count -= $order['count'];
                 $set_orders->push([
                     'basket_id' => null,
@@ -65,25 +65,25 @@ class OrderController extends Controller
             $user->save();
         } elseif ($sum - $price <= 500) {
             $remaining_sum = [
-                'cash'=> 0,
-                'card'=> 0,
+                'cash' => 0,
+                'card' => 0,
             ];
             $copy_price = $price;
             $basket = Basket::where('user_id', $user->id)->where('debt->remaining', '>', 0)->first();
             if ($basket) {
                 $copy_price -= $card;
-                if($copy_price < 0){
+                if ($copy_price < 0) {
                     $card += $copy_price;
                     $remaining_sum['card'] = abs($copy_price);
                 }
                 $copy_price -= $cash;
-                if($copy_price < 0){
+                if ($copy_price < 0) {
                     $cash += $copy_price;
                     $remaining_sum['cash'] = abs($copy_price);
                 }
                 $payment = new PaymentController();
                 $payment->paidDebt(new Request([
-                    'employee_id'=> $request->user()->id,
+                    'employee_id' => $request->user()->id,
                     'basket_id' => $basket->id,
                     'cash' => $remaining_sum['cash'],
                     'card' => $remaining_sum['card'],

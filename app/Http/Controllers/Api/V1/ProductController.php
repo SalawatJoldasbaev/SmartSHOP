@@ -86,19 +86,24 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $delete = $request->delete == "true" ? true : false;
-
         $category_id = $request->category_id;
         $search = $request->search;
+        $count = $request->count;
         $products = Product::when($category_id, function ($query) use ($category_id) {
             $query->where('category_id', $category_id);
-        })->when($search, function ($query) use ($search){
+        })->when($search, function ($query) use ($search) {
             if ($search[0] == '#') {
                 $search = str_replace('#', '', $search);
                 $query->where('id', $search);
-            }else{
+            } else {
                 $query->where('name', 'like', '%' . $search . '%');
             }
         })->orderBy('id', 'desc');
+        if (isset($count)) {
+            $products = $products->whereHas('warehouse', function ($query) use ($count) {
+                $query->where('count', '>', $count);
+            });
+        }
         if ($delete) {
             $products = $products->withTrashed();
         }
