@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\Api\Excel;
 
-use Illuminate\Http\Request;
 use App\Exports\ProductExport;
 use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Imports\ProductImport;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Response;
 
 class ProductExcelController extends Controller
 {
