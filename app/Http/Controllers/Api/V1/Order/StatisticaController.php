@@ -28,7 +28,7 @@ class StatisticaController extends Controller
         }
         $orders = $orders->flatten()->groupBy('product_id');
         $response = $orders->mapWithKeys(function ($group, $key) use ($category_id) {
-            $product = Product::find($group->first()['product_id']);
+            $product = Product::where('id', $group->first()['product_id'])->withTrashed()->first();
             if ($category_id) {
                 if ($category_id == $product->category_id) {
                     return [
