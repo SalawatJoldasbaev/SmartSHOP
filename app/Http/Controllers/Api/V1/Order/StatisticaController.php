@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1\Order;
 
+use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Http\Controllers\Controller;
 use App\Models\Basket;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\V1\ApiResponse;
 
 class StatisticaController extends Controller
 {
@@ -34,9 +34,9 @@ class StatisticaController extends Controller
                     return [
                         $key => [
                             'product_id' => $key,
-                            'product_name' => $product->name,
-                            'count' => $group->sum('count')
-                        ]
+                            'product_name' => $product->name ?? null,
+                            'count' => $group->sum('count'),
+                        ],
                     ];
                 } else {
                     return [];
@@ -45,13 +45,13 @@ class StatisticaController extends Controller
                 return [
                     $key => [
                         'product_id' => $key,
-                        'product_name' => $product->name,
-                        'count' => $group->sum('count')
-                    ]
+                        'product_name' => $product->name ?? null,
+                        'count' => $group->sum('count'),
+                    ],
                 ];
             }
         })->values()->toArray();
 
-        return ApiResponse::success(data: $response);
+        return ApiResponse::success(data:$response);
     }
 }
