@@ -37,10 +37,16 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
                 'whole_percent' => 1,
             ]);
         }
-        $data['product_name'] = str_replace("  ", " ", $data['product_name']);
-        $data['product_name'] = str_replace("  ", " ", $data['product_name']);
+        $product_name = '';
+        $list = [];
+        foreach (explode(" ", $data['product_name']) as $key => $value) {
+            if (strlen(trim($value)) > 0) {
+                $list[] = trim($value);
+            }
+        }
+        $product_name = implode($list);
         //warehouse_count
-        $product = Product::where('name', $data['product_name'])->first();
+        $product = Product::where('name', $product_name)->first();
         if (!$product) {
             $max = Currency::where('code', $data['price_max_currency'])->first();
             $wholesale = Currency::where('code', $data['wholesale_price_currency'])->first();
@@ -49,7 +55,7 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
             $product = Product::create([
                 'category_id' => $category->id,
                 'image' => null,
-                'name' => $data['product_name'],
+                'name' => $product_name,
                 'brand' => $data['brand'],
                 'cost_price' => [
                     'price' => $data['cost_price'],
