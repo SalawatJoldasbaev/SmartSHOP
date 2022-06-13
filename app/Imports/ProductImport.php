@@ -37,7 +37,8 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
                 'whole_percent' => 1,
             ]);
         }
-        $data['product_name'] = str_replace(" ", " ", $data['product_name']);
+        $data['product_name'] = str_replace("  ", " ", $data['product_name']);
+        $data['product_name'] = str_replace("  ", " ", $data['product_name']);
         //warehouse_count
         $product = Product::where('name', $data['product_name'])->first();
         if (!$product) {
