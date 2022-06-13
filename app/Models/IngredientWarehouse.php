@@ -10,6 +10,6 @@ class IngredientWarehouse extends Model
     use HasFactory;
 
     //protected $fillable = ['id'];
-    //protected $guarded = ['id'];
+    protected $guarded = ['id'];
     //protected $casts = [];
 }

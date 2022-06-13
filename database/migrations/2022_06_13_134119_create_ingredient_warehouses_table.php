@@ -11,6 +11,7 @@ return new class extends Migration {
         Schema::create('ingredient_warehouses', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Ingredient::class);
+            $table->double('count');
             $table->double('cost_price');
             $table->timestamp('ordered_at');
             $table->boolean('active');

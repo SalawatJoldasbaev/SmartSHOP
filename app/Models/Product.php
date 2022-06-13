@@ -37,4 +37,14 @@ class Product extends Model
             get: fn () => ucfirst($qrcode->uuid ?? null),
         );
     }
+
+    public function Ingredients()
+    {
+        return $this->hasMany(IngredientProduct::class, 'product_id', 'id');
+    }
+
+    public function Preparation_day()
+    {
+        return $this->hasOne(IngredientProductTime::class);
+    }
 }

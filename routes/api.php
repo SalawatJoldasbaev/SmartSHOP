@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\Image\ImageController;
+use App\Http\Controllers\Api\Ingredient\IngredientController;
+use App\Http\Controllers\Api\Ingredient\IngredientProductController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\QrCode\QrCodeController;
 use App\Http\Controllers\Api\V1\ConsumptionController;
@@ -46,6 +48,24 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::put('/', 'update');
             Route::delete('/{id}', 'delete');
         });
+
+    Route::prefix('/ingredients')
+    ->controller(IngredientController::class)
+    ->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'create');
+        Route::put('/{ingredient}', 'update');
+        Route::delete('/{ingredient}', 'delete');
+    });
+
+    Route::prefix('/ingredient/product')
+    ->controller(IngredientProductController::class)
+    ->group(function () {
+        Route::get('/{product}', 'index');
+        Route::post('/', 'create');
+        Route::delete('/position/{position}', 'delete');
+    });
+
     Route::get('/currency', [CurrencyController::class, 'index']);
     Route::post('/currency', [CurrencyController::class, 'setCurrency']);
     Route::post('/warehouse', [WarehouseController::class, 'create']);

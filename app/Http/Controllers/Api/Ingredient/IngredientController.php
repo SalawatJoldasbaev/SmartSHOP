@@ -41,7 +41,7 @@ class IngredientController extends Controller
 
     public function index(Request $request)
     {
-        $ingredient = Ingredient::all(['name', 'unit_id'])->toArray();
+        $ingredient = Ingredient::all(['id', 'name', 'unit_id'])->toArray();
         return ApiResponse::data(payload:$ingredient);
     }
 }
