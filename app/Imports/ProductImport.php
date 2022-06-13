@@ -44,7 +44,7 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
                 $list[] = trim($value);
             }
         }
-        $product_name = implode($list);
+        $product_name = implode(" ", $list);
         //warehouse_count
         $product = Product::where('name', $product_name)->first();
         if (!$product) {
