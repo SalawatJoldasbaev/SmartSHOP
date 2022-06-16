@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\Image\ImageController;
 use App\Http\Controllers\Api\Ingredient\IngredientController;
 use App\Http\Controllers\Api\Ingredient\IngredientProductController;
+use App\Http\Controllers\Api\Ingredient\IngredientWarehouseController;
+use App\Http\Controllers\Api\Ingredient\ProductionController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\QrCode\QrCodeController;
 use App\Http\Controllers\Api\V1\ConsumptionController;
@@ -65,6 +67,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', 'create');
         Route::delete('/position/{position}', 'delete');
     });
+
+    Route::prefix('/ingredients/warehouses')
+    ->controller(IngredientWarehouseController::class)
+    ->group(function () {
+        Route::post('/', 'create');
+        Route::get('/', 'index');
+        Route::delete('/position/{position}', 'delete');
+    });
+    Route::post('/production', [ProductionController::class, 'Production']);
 
     Route::get('/currency', [CurrencyController::class, 'index']);
     Route::post('/currency', [CurrencyController::class, 'setCurrency']);
