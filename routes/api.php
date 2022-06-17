@@ -73,7 +73,6 @@ Route::middleware('auth:sanctum')->group(function () {
     ->group(function () {
         Route::post('/', 'create');
         Route::get('/', 'index');
-        Route::delete('/position/{position}', 'delete');
     });
     Route::post('/production', [ProductionController::class, 'Production']);
 
