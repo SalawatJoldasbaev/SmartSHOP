@@ -108,5 +108,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/image/upload', [ImageController::class, 'upload']);
     Route::post('/return/orders', [ReturnOrderController::class, 'orders']);
 });
-
 Route::get('/qrcode/', [QrCodeController::class, 'generate'])->name('qrcode');
