@@ -10,6 +10,16 @@ use App\Models\IngredientWarehouse;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
+// $temp['ingredients'][] = [
+//     'warehouse_id'=> 0,
+//     'ingredient_id'=> $ingredient->ingredient_id,
+//     'ingredient_name'=> $ingredient->ingredient->name,
+//     'count'=> isset($used_ingredients[$product->id][$ingredient->ingredient_id]) ? $qty - $used_ingredients[$product->id][$ingredient->ingredient_id]: $qty,
+//     'price'=> 0,
+//     'ordered_at'=> null,
+//     'status'=> 'not enough'
+// ];
+
 class ProductionController extends Controller
 {
     public function Production(ProductionRequest $request)
@@ -32,15 +42,6 @@ class ProductionController extends Controller
                 $qty = $ingredient->count*$item['count'];
                 $warehouse = $warehouses->where('count', '!=', 0)->where('ingredient_id', $ingredient->ingredient_id)->first();
                 if (!$warehouse) {
-                    $temp['ingredients'][] = [
-                        'warehouse_id'=> 0,
-                        'ingredient_id'=> $ingredient->ingredient_id,
-                        'ingredient_name'=> $ingredient->ingredient->name,
-                        'count'=> isset($used_ingredients[$product->id][$ingredient->ingredient_id]) ? $qty - $used_ingredients[$product->id][$ingredient->ingredient_id]: $qty,
-                        'price'=> 0,
-                        'ordered_at'=> null,
-                        'status'=> 'not enough'
-                    ];
                     continue;
                 }
                 if ($warehouse->count - $qty >= 0) {
@@ -52,6 +53,7 @@ class ProductionController extends Controller
                         $warehouse->count -= $qty;
                         $used_ingredients[$product->id][$warehouse->ingredient_id] = $qty;
                     }
+
                     $temp['ingredients'][] = [
                         'warehouse_id'=> $warehouse->id,
                         'ingredient_id'=> $warehouse->ingredient_id,
