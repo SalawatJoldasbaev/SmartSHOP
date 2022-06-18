@@ -29,12 +29,4 @@ class Product extends Model
     {
         return $this->hasOne(Warehouse::class)->where('active', true);
     }
-
-    protected function uuid(): Attribute
-    {
-        $qrcode = QrCode::where('additional->product_id', $this->id)->first();
-        return Attribute::make(
-            get: fn () => ucfirst($qrcode->uuid ?? null),
-        );
-    }
 }

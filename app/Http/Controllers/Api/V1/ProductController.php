@@ -115,13 +115,15 @@ class ProductController extends Controller
             'data' => [],
         ];
         $temp = [];
+        $currency = Currency::all();
+        $units = Unit::all();
         foreach ($products as $product) {
-            $cost_price = Currency::find($product->cost_price['currency_id']);
-            $min_price = Currency::find($product->min_price['currency_id']);
-            $max_price = Currency::find($product->max_price['currency_id']);
-            $whole_price = Currency::find($product->whole_price['currency_id']);
+            $cost_price = $currency->where('id', $product->cost_price['currency_id'])->first();
+            $min_price =  $currency->where('id', $product->min_price['currency_id'])->first();
+            $max_price =  $currency->where('id', $product->max_price['currency_id'])->first();
+            $whole_price =  $currency->where('id', $product->whole_price['currency_id'])->first();
             $id = $product->id;
-            $unit = Unit::find($product->warehouse?->unit_id);
+            $unit = $units->where('id', $product->warehouse?->unit_id)->first();
             if ($delete) {
                 $category = $product->category()->withTrashed()->first();
             } else {
@@ -171,10 +173,10 @@ class ProductController extends Controller
                     ],
                     'count' => $product->warehouse->count,
                 ] : null,
-                'qr_code_link' => $product->uuid ? route('qrcode', [
+                'qr_code_link' =>  route('qrcode', [
                     'uuid' => $product->uuid,
                     'type' => 'product',
-                ]) : null,
+                ]),
                 'deleted_at' => $product->deleted_at,
             ];
             $final['data'][] = $temp;

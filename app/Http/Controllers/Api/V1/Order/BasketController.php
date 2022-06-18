@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Models\PaymentHistory;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\V1\ApiResponse;
-use App\Models\QrCode;
 
 class BasketController extends Controller
 {
@@ -116,14 +115,10 @@ class BasketController extends Controller
 
     public function basketOrders(Request  $request)
     {
-        try{
+        try {
             $basket_id = $request->basket_id;
             $uuid = $request->uuid;
-            if (!$basket_id and $uuid) {
-                $uuid = QrCode::where('uuid', $uuid)->firstOrFail();
-                $basket_id = $uuid->additional['basket_id'];
-            }
-            $basket = Basket::findOrFail($basket_id);
+            $basket = Basket::where('uuid', $uuid)->firstOrFail();
         } catch (\Throwable $th) {
             return ApiResponse::error('not found', 404);
         }
