@@ -73,6 +73,8 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
                     'price' => $data['wholesale_price'],
                     'currency_id' => $wholesale->id,
                 ],
+                'uuid'=> $data['uuid'],
+                'image'=> $data['image']
             ]);
             if (isset($data['warehouse_count'])) {
                 $code = Code::newCode();

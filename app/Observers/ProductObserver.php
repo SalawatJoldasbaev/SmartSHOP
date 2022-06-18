@@ -15,13 +15,15 @@ class ProductObserver
      */
     public function creating(Product $product)
     {
-        $uuid = Str::uuid();
-        $check = Product::where('uuid', $uuid)->first();
-        while ($check) {
+        if (!$product->uuid) {
             $uuid = Str::uuid();
             $check = Product::where('uuid', $uuid)->first();
+            while ($check) {
+                $uuid = Str::uuid();
+                $check = Product::where('uuid', $uuid)->first();
+            }
+            $product->uuid = $uuid;
         }
-        $product->uuid = $uuid;
     }
 
     /**
