@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Ingredient;
 use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\IngredientWarehouseCreateRequest;
+use App\Models\Ingredient;
 use App\Models\IngredientWarehouse;
 use App\Models\IngredientWarehouseBasket;
 use App\Models\IngredientWarehouseOrder;
@@ -67,6 +68,18 @@ class IngredientWarehouseController extends Controller
                     'price'=> $ingredient->cost_price,
                     'usd_rate'=> $basket->usd_rate,
                     'ordered_at'=> $basket->created_at
+                ];
+            }
+        }
+        $ingredients = Ingredient::all();
+        foreach ($ingredients as $ingredient) {
+            if (!array_key_exists($ingredient->id, $final)) {
+                $final[$ingredient->id] = [
+                    'ingredient_id'=> $ingredient->id,
+                    'ingredient_name'=> $ingredient->name,
+                    'unit_id'=> $ingredient->unit_id,
+                    'count'=> 0,
+                    'items'=>[]
                 ];
             }
         }

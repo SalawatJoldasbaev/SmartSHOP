@@ -5,20 +5,12 @@ namespace App\Http\Controllers\Api\Ingredient;
 use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductionRequest;
+use App\Models\Ingredient;
 use App\Models\IngredientProduct;
 use App\Models\IngredientWarehouse;
 use App\Models\Product;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
-
-// $temp['ingredients'][] = [
-//     'warehouse_id'=> 0,
-//     'ingredient_id'=> $ingredient->ingredient_id,
-//     'ingredient_name'=> $ingredient->ingredient->name,
-//     'count'=> isset($used_ingredients[$product->id][$ingredient->ingredient_id]) ? $qty - $used_ingredients[$product->id][$ingredient->ingredient_id]: $qty,
-//     'price'=> 0,
-//     'ordered_at'=> null,
-//     'status'=> 'not enough'
-// ];
 
 class ProductionController extends Controller
 {
@@ -27,9 +19,8 @@ class ProductionController extends Controller
         $warehouses = IngredientWarehouse::where('active', true)->get();
         $final = [];
         $used_ingredients = [];
-
         foreach ($request->all() as $item) {
-            $ingredients = IngredientProduct::where('product_id', $item['product_id'])->get(['ingredient_id', 'count']);
+            $ingredients = IngredientProduct::where('product_id', $item['product_id'])->get(['ingredient_id as id', 'count']);
             $product = Product::find($item['product_id']);
             $temp = [
                 'product_id'=> $product->id,
@@ -40,51 +31,56 @@ class ProductionController extends Controller
             for ($i = 0; $i < count($ingredients); $i++) {
                 $ingredient = $ingredients[$i];
                 $qty = $ingredient->count*$item['count'];
-                $warehouse = $warehouses->where('count', '!=', 0)->where('ingredient_id', $ingredient->ingredient_id)->first();
+                $warehouse = $warehouses->where('count', '!=', 0)->where('ingredient_id', $ingredient->id)->first();
                 if (!$warehouse) {
+                    $temp['ingredients'][] = [
+                        'warehouse_id'=> 0,
+                        'ingredient_id'=> $ingredient->id,
+                        'ingredient_name'=> Ingredient::find($ingredient->id)->name,
+                        'count'=> isset($used_ingredients[$product->id][$ingredient->id]) ?$qty-$used_ingredients[$product->id][$ingredient->id]: $qty,
+                        'price'=> 0,
+                        'ordered_at'=> null,
+                        'status'=> 'not enough'
+                    ];
                     continue;
                 }
+                $tempItem = [
+                    'warehouse_id'=> $warehouse->id,
+                    'ingredient_id'=> $warehouse->ingredient_id,
+                    'ingredient_name'=> $warehouse->ingredient->name,
+                    'count'=> 0,
+                    'price'=> $warehouse->cost_price,
+                    'ordered_at'=> date_format($warehouse->basket->created_at, 'Y-m-d H:i:s'),
+                    'status'=> 'enough'
+                ];
                 if ($warehouse->count - $qty >= 0) {
-                    if (isset($used_ingredients[$product->id][$warehouse->ingredient_id])) {
-                        $temp_qty = ($qty - $used_ingredients[$product->id][$warehouse->ingredient_id]);
-                        $warehouse->count -= $temp_qty;
-                        $used_ingredients[$product->id][$warehouse->ingredient_id] += $temp_qty;
-                    } else {
-                        $warehouse->count -= $qty;
-                        $used_ingredients[$product->id][$warehouse->ingredient_id] = $qty;
-                    }
-
-                    $temp['ingredients'][] = [
-                        'warehouse_id'=> $warehouse->id,
-                        'ingredient_id'=> $warehouse->ingredient_id,
-                        'ingredient_name'=> $warehouse->ingredient->name,
-                        'count'=> $qty - ($temp_qty ?? 0),
-                        'price'=> $warehouse->cost_price,
-                        'ordered_at'=> $warehouse->ordered_at,
-                        'status'=> 'enough'
-                    ];
+                    $this->cal($qty, $used_ingredients, $product, $ingredient);
+                    $warehouse->count -= $qty;
+                    $tempItem['count'] = $qty;
+                    $temp['ingredients'][] = $tempItem;
                 } else {
-                    if (isset($used_ingredients[$warehouse->ingredient_id])) {
-                        $used_ingredients[$product->id][$warehouse->ingredient_id] += $warehouse->count;
-                    } else {
-                        $used_ingredients[$product->id][$warehouse->ingredient_id] = $warehouse->count;
-                    }
-                    $temp['ingredients'][] = [
-                        'warehouse_id'=> $warehouse->id,
-                        'ingredient_id'=> $warehouse->ingredient_id,
-                        'ingredient_name'=> $warehouse->ingredient->name,
-                        'count'=> $warehouse->count,
-                        'price'=> $warehouse->cost_price,
-                        'ordered_at'=> $warehouse->ordered_at,
-                        'status'=> 'enough'
-                    ];
+                    $this->cal($qty, $used_ingredients, $product, $ingredient, $warehouse->count);
+                    $tempItem['count'] = $warehouse->count;
+                    $temp['ingredients'][] = $tempItem;
                     $warehouse->count = 0;
-                    $i--;
+                    if ($ingredient->count*$item['count'] != $used_ingredients[$product->id][$ingredient->id]) {
+                        $i--;
+                    }
                 }
             }
             $final[] = $temp;
-            $temp = [];
         }
-        return ApiResponse::success(data:$final);
+
+        return $final;
+    }
+
+    private function cal(&$qty, &$used_ingredients, $product, $ingredient, $min= null)
+    {
+        if (isset($used_ingredients[$product->id][$ingredient->id])) {
+            $qty  -= $used_ingredients[$product->id][$ingredient->id];
+            $used_ingredients[$product->id][$ingredient->id] += $min?? $qty;
+        } else {
+            $used_ingredients[$product->id][$ingredient->id] = $min?? $qty;
+        }
     }
 }
