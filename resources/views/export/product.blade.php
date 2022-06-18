@@ -14,6 +14,8 @@
         <th>PRICE MIN</th>
         <th>PRICE MIN CURRENCY</th>
         <th>WAREHOUSE COUNT</th>
+        <th>UUID</th>
+        <th>IMAGE</th>
     </tr>
     </thead>
     <tbody>
@@ -35,6 +37,8 @@
             <td>{{ $product['min_price']['price'] }}</td>
             <td>{{ $product['min_price']['code'] }}</td>
             <td>{{$product['warehouse']['count'] ?? 0}}</td>
+            <td>{{$product['uuid'] ?? ''}}</td>
+            <td>{{$product['image'] ?? ''}}</td>
         </tr>
     @endforeach
     </tbody>

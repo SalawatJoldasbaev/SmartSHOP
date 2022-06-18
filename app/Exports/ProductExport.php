@@ -30,6 +30,7 @@ class ProductExport implements FromView
                     'id' => $product->category_id,
                     'name' => $product->category->name,
                 ],
+                'image'=> $product->image,
                 'name' => $product->name,
                 'brand' => $product->brand,
                 'cost_price' => [
@@ -57,6 +58,7 @@ class ProductExport implements FromView
                     ],
                     'count' => $product->warehouse->count
                 ] : null,
+                'uuid'=> $product->uuid,
             ];
             $final[] = $temp;
         }
