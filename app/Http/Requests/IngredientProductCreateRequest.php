@@ -28,7 +28,6 @@ class IngredientProductCreateRequest extends FormRequest
     {
         return [
             'product_id'=> 'required|exists:products,id',
-            'preparation_day'=> 'nullable',
             'ingredients'=> 'required|array',
             'ingredients.*.ingredient_id'=> 'required|exists:ingredients,id',
             'ingredients.*.count'=> 'required',

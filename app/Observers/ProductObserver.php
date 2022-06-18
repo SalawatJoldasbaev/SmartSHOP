@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\Product;
-use App\Models\QrCode;
 use Str;
 
 class ProductObserver
@@ -14,22 +13,15 @@ class ProductObserver
      * @param  \App\Models\Product  $product
      * @return void
      */
-    public function created(Product $product)
+    public function creating(Product $product)
     {
         $uuid = Str::uuid();
-        $check = QrCode::where('uuid', $uuid)->first();
+        $check = Product::where('uuid', $uuid)->first();
         while ($check) {
             $uuid = Str::uuid();
-            $check = QrCode::where('uuid', $uuid)->first();
+            $check = Product::where('uuid', $uuid)->first();
         }
-
-        $code = QrCode::create([
-            'uuid' => $uuid,
-            'type' => 'product',
-            'additional' => [
-                'product_id' => $product->id
-            ]
-        ]);
+        $product->uuid = $uuid;
     }
 
     /**

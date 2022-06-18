@@ -35,12 +35,4 @@ class Basket extends Model
     {
         return $this->hasMany(Order::class, 'basket_id');
     }
-
-    protected function uuid(): Attribute
-    {
-        $qrcode = QrCode::where('additional->basket_id', $this->id)->first();
-        return Attribute::make(
-            get: fn () => $qrcode->uuid ?? null,
-        );
-    }
 }

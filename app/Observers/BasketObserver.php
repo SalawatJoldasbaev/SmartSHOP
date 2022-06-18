@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\Basket;
-use App\Models\QrCode;
 use Illuminate\Support\Str;
 
 class BasketObserver
@@ -14,21 +13,15 @@ class BasketObserver
      * @param  \App\Models\Basket  $basket
      * @return void
      */
-    public function created(Basket $basket)
+    public function creating(Basket $basket)
     {
         $uuid = Str::uuid();
-        $check = QrCode::where('uuid', $uuid)->first();
+        $check = Basket::where('uuid', $uuid)->first();
         while ($check) {
             $uuid = Str::uuid();
-            $check = QrCode::where('uuid', $uuid)->first();
+            $check = Basket::where('uuid', $uuid)->first();
         }
-        QrCode::create([
-            'uuid' => $uuid,
-            'type' => 'basket',
-            'additional' => [
-                'basket_id' => $basket->id
-            ]
-        ]);
+        $basket->uuid = $uuid;
     }
 
     /**

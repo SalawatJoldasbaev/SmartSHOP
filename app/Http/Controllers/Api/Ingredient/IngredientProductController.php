@@ -23,13 +23,6 @@ class IngredientProductController extends Controller
                 'count'=> $ingredient['count']
             ]);
         }
-        if ($request->preparation_day) {
-            IngredientProductTime::UpdateOrCreate([
-                'product_id'=> $request->product_id,
-            ], [
-                 'preparation_day'=>$request->preparation_day,
-            ]);
-        }
 
         return ApiResponse::success();
     }
@@ -45,7 +38,6 @@ class IngredientProductController extends Controller
                     'unit_id'=> $position->ingredient->unit_id
                 ],
                 'count'=> $position->count,
-                'preparation_day'=> $product->preparation_day->preparation_day
             ];
         }
 

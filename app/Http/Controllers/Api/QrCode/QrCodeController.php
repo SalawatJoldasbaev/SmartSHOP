@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\QrCode;
 
-use App\Models\QrCode as QrCodeModel;
 use App\Models\Product;
 use App\Models\Currency;
 use Illuminate\Http\Request;
@@ -35,8 +34,7 @@ class QrCodeController extends Controller
     private function product($uuid)
     {
         try {
-            $qrcode = QrCodeModel::where('uuid', $uuid)->firstOrFail();
-            $product = Product::findOrFail($qrcode['additional']['product_id']);
+            $product = Product::where('uuid', $uuid)->firstOrFail();
         } catch (\Throwable $th) {
             return ApiResponse::error('product not found', 404);
         }
