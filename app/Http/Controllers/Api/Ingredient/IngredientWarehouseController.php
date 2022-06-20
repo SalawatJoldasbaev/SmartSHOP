@@ -46,6 +46,10 @@ class IngredientWarehouseController extends Controller
         $final = [];
         foreach ($ingredients as $ingredient) {
             $basket = IngredientWarehouseBasket::find($ingredient->ingredient_warehouse_basket_id);
+            if (is_null($ingredient->ingredient)) {
+                continue;
+            }
+
             if (!array_key_exists($ingredient->ingredient_id, $final)) {
                 $final[$ingredient->ingredient_id] = [
                     'ingredient_id'=> $ingredient->ingredient_id,
