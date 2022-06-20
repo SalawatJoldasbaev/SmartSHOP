@@ -117,7 +117,7 @@ class BasketController extends Controller
     {
         try {
             $basket_id = $request->basket_id;
-            $uuid = $request->uuid ?? $basket_id;
+            $uuid = $request->uuid;
             $basket = Basket::when($uuid, function ($query, $uuid) {
                 $query->where('uuid', $uuid);
             })->when($basket_id, function ($query, $basket_id) {
