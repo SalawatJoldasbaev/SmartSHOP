@@ -151,6 +151,7 @@ class BasketController extends Controller
                 'id' => $order->id,
                 'product_id' => $order->product_id,
                 'product_name' => $order_product->name,
+                'image' => $order_product->image,
                 'brand' => $order_product->brand,
                 'count' => $order->count,
                 'unit_id' => $order->unit_id,
