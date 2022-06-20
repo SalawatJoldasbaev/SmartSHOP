@@ -118,7 +118,7 @@ class BasketController extends Controller
         try {
             $basket_id = $request->basket_id;
             $uuid = $request->uuid;
-            $basket = Basket::where('uuid', $uuid)->firstOrFail();
+            $basket = Basket::where('uuid', ($uuid ?? $basket_id))->firstOrFail();
         } catch (\Throwable $th) {
             return ApiResponse::error('not found', 404);
         }
