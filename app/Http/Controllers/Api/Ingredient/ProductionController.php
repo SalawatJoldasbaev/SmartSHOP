@@ -6,10 +6,11 @@ use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductionRequest;
 use App\Models\Ingredient;
+use App\Models\IngredientBasket;
+use App\Models\IngredientOrder;
 use App\Models\IngredientProduct;
 use App\Models\IngredientWarehouse;
 use App\Models\Product;
-use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 
 class ProductionController extends Controller
@@ -82,5 +83,79 @@ class ProductionController extends Controller
         } else {
             $used_ingredients[$product->id][$ingredient->id] = $min?? $qty;
         }
+    }
+
+    public function createBasket(ProductionRequest $request)
+    {
+        $warehouses = IngredientWarehouse::where('active', true)->get();
+        $final = [];
+        $used_ingredients = [];
+        $production = true;
+        foreach ($request->all() as $item) {
+            $ingredients = IngredientProduct::where('product_id', $item['product_id'])->get(['ingredient_id as id', 'count']);
+            $product = Product::find($item['product_id']);
+            $temp = [
+                'product_id'=> $product->id,
+                'count'=> $item['count'],
+                'ingredients'=>[]
+            ];
+            if ($production == false) {
+                break;
+            }
+            for ($i = 0; $i < count($ingredients); $i++) {
+                $ingredient = $ingredients[$i];
+                $qty = $ingredient->count*$item['count'];
+                $warehouse = $warehouses->where('count', '!=', 0)->where('ingredient_id', $ingredient->id)->first();
+                if (!$warehouse) {
+                    $production = false;
+                    break;
+                }
+                $tempItem = [
+                    'warehouse_id'=> $warehouse->id,
+                    'ingredient_id'=> $warehouse->ingredient_id,
+                    'count'=> 0,
+                    'price'=> $warehouse->cost_price,
+                ];
+                if ($warehouse->count - $qty >= 0) {
+                    $this->cal($qty, $used_ingredients, $product, $ingredient);
+                    $warehouse->count -= $qty;
+                    $tempItem['count'] = $qty;
+                    $temp['ingredients'][] = $tempItem;
+                } else {
+                    $this->cal($qty, $used_ingredients, $product, $ingredient, $warehouse->count);
+                    $tempItem['count'] = $warehouse->count;
+                    $temp['ingredients'][] = $tempItem;
+                    $warehouse->count = 0;
+                    if ($ingredient->count*$item['count'] != $used_ingredients[$product->id][$ingredient->id]) {
+                        $i--;
+                    }
+                }
+            }
+            $final[] = $temp;
+        }
+        if ($production == false) {
+            return ApiResponse::error('error', 409);
+        }
+        $basket = IngredientBasket::create([
+            'deadline'=> $request->deadline ?? 1,
+            'active'=> true
+        ]);
+        foreach ($final as $itemFinal) {
+            IngredientOrder::create([
+                'ingredient_basket_id'=> $basket->id,
+                'product_id'=> $itemFinal['product_id'],
+                'count'=> $itemFinal['count'],
+                'ingredients'=> $itemFinal['ingredients']
+            ]);
+            foreach ($itemFinal['ingredients'] as $itemIngredient) {
+                $warehouse = IngredientWarehouse::find($itemIngredient['warehouse_id']);
+                if ($warehouse->count -  $itemIngredient['count'] == 0) {
+                    $warehouse->active = false;
+                }
+                $warehouse->count = $warehouse->count -  $itemIngredient['count'];
+                $warehouse->save();
+            }
+        }
+        return ApiResponse::success();
     }
 }

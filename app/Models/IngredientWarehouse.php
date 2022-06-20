@@ -21,6 +21,6 @@ class IngredientWarehouse extends Model
 
     public function basket()
     {
-        return $this->hasOne(IngredientWarehouseBasket::class, 'id');
+        return $this->hasOne(IngredientWarehouseBasket::class, 'id', 'ingredient_warehouse_basket_id');
     }
 }
