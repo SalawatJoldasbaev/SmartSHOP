@@ -27,7 +27,7 @@ class IngredientCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=> 'required|unique:ingredients,name',
+            'name'=> 'required',
             'unit_id'=> 'required|exists:units,id'
         ];
     }
