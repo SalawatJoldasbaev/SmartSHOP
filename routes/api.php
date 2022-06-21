@@ -76,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/production', [ProductionController::class, 'Production']);
     Route::post('/production/create', [ProductionController::class, 'createBasket']);
+    Route::get('/production/baskets', [ProductionController::class, 'baskets']);
 
     Route::get('/currency', [CurrencyController::class, 'index']);
     Route::post('/currency', [CurrencyController::class, 'setCurrency']);

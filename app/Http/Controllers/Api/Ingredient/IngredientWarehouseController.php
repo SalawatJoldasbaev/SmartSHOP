@@ -42,7 +42,7 @@ class IngredientWarehouseController extends Controller
 
     public function index(Request $request)
     {
-        $ingredients = IngredientWarehouse::where('active', true)->get();
+        $ingredients = IngredientWarehouse::orderBy('id', 'desc')->where('active', true)->get();
         $final = [];
         foreach ($ingredients as $ingredient) {
             $basket = IngredientWarehouseBasket::find($ingredient->ingredient_warehouse_basket_id);

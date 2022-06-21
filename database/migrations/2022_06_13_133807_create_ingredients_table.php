@@ -13,6 +13,7 @@ return new class extends Migration {
             $table->string('name')->unique();
             $table->foreignIdFor(Unit::class);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Ingredient;
 
 use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductionCreateBasketRequest;
 use App\Http\Requests\ProductionRequest;
 use App\Models\Ingredient;
 use App\Models\IngredientBasket;
@@ -85,7 +86,7 @@ class ProductionController extends Controller
         }
     }
 
-    public function createBasket(ProductionRequest $request)
+    public function createBasket(ProductionCreateBasketRequest $request)
     {
         $warehouses = IngredientWarehouse::where('active', true)->get();
         $final = [];
@@ -137,7 +138,7 @@ class ProductionController extends Controller
             return ApiResponse::error('error', 409);
         }
         $basket = IngredientBasket::create([
-            'deadline'=> $request->deadline ?? 1,
+            'deadline'=> $request->deadline,
             'active'=> true
         ]);
         foreach ($final as $itemFinal) {
@@ -157,5 +158,40 @@ class ProductionController extends Controller
             }
         }
         return ApiResponse::success();
+    }
+
+    public function baskets(Request $request)
+    {
+        $baskets = IngredientBasket::where('active', true)->paginate(30);
+        $final = [
+            'last_page'=> $baskets->lastPage(),
+            'data'=>[]
+        ];
+
+        foreach ($baskets as $basket) {
+            $temp = [
+                'basket_id'=> $basket->id,
+                'deadline'=> $basket->deadline,
+                'orders'=>[]
+            ];
+            foreach ($basket->orders as $order) {
+                $ingredients = [];
+                foreach ($order->ingredients as $ingredient) {
+                    $ingredients[] = [
+                        'ingredient_id'=> $ingredient['ingredient_id'],
+                        'ingredient_name'=> Ingredient::where('id', $ingredient['ingredient_id'])->withTrashed()->first()->name,
+                        'price'=> $ingredient['price'],
+                        'count'=> $ingredient['count']
+                    ];
+                }
+                $temp['orders'][] = [
+                    'product_id'=> $order->product_id,
+                    'count'=> $order->count,
+                    'ingredients'=> $ingredients
+                ];
+            }
+            $final['data'][] = $temp;
+        }
+        return ApiResponse::success(data:$final);
     }
 }

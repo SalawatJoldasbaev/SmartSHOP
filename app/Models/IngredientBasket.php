@@ -12,4 +12,9 @@ class IngredientBasket extends Model
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
     //protected $casts = [];
+
+    public function orders()
+    {
+        return $this->hasMany(IngredientOrder::class, 'ingredient_basket_id', 'id');
+    }
 }

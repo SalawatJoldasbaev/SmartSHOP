@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\IngredientCreateRequest;
 use App\Http\Requests\IngredientUpdateRequest;
 use App\Models\Ingredient;
+use App\Models\IngredientProduct;
 use Illuminate\Http\Request;
 
 class IngredientController extends Controller
@@ -35,8 +36,13 @@ class IngredientController extends Controller
 
     public function delete(Request $request, Ingredient $ingredient)
     {
-        $ingredient->delete();
-        return ApiResponse::success();
+        $ingredient = IngredientProduct::where('ingredient_id', $ingredient->id)->first();
+        if (!$ingredient) {
+            $ingredient->delete();
+            return ApiResponse::success();
+        } else {
+            return ApiResponse::error('not deleted', 409);
+        }
     }
 
     public function index(Request $request)
