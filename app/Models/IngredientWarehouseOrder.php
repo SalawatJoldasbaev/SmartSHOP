@@ -12,4 +12,9 @@ class IngredientWarehouseOrder extends Model
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
     //protected $casts = [];
+
+    public function Ingredient()
+    {
+        return $this->hasOne(Ingredient::class, 'id', 'ingredient_id')->withTrashed();
+    }
 }

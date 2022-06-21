@@ -11,4 +11,9 @@ class IngredientWarehouseBasket extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
+    public function orders()
+    {
+        return $this->hasMany(IngredientWarehouseOrder::class, 'ingredient_warehouse_basket_id', 'id');
+    }
 }

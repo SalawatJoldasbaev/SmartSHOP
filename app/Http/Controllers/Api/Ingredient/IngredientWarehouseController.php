@@ -89,4 +89,31 @@ class IngredientWarehouseController extends Controller
         }
         return ApiResponse::data(true, 'success', array_values($final));
     }
+
+    public function histories(Request $request)
+    {
+        $baskets = IngredientWarehouseBasket::orderBy('id', 'desc')->paginate(30);
+        $final = [
+            'last_page'=> $baskets->lastPage(),
+            'data'=> []
+        ];
+        foreach ($baskets as $basket) {
+            $temp = [
+                'basket_id'=> $basket->id,
+                'usd_rate'=> $basket->usd_rate,
+                'ordered_at'=> $basket->created_at,
+                'orders'=> []
+            ];
+            foreach ($basket->orders as $order) {
+                $temp['orders'][] = [
+                    'ingredient_id'=> $order->ingredient_id,
+                    'ingredient_name'=> $order->ingredient->name,
+                    'count'=> $order->count,
+                    'price'=> $order->price,
+                ];
+            }
+            $final['data'][] = $temp;
+        }
+        return ApiResponse::success(data:$final);
+    }
 }

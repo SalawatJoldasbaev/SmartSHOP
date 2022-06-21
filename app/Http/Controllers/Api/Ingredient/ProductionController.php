@@ -187,11 +187,10 @@ class ProductionController extends Controller
         ];
 
         foreach ($baskets as $basket) {
-            $temp = [
+            $final['data'][] = [
                 'basket_id'=> $basket->id,
                 'deadline'=> $basket->deadline,
             ];
-            $final['data'][] = $temp;
         }
         return ApiResponse::success(data:$final);
     }
