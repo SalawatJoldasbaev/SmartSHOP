@@ -36,8 +36,8 @@ class IngredientController extends Controller
 
     public function delete(Request $request, Ingredient $ingredient)
     {
-        $ingredient = IngredientProduct::where('ingredient_id', $ingredient->id)->first();
-        if (!$ingredient) {
+        $ingredientWarehouse = IngredientProduct::where('ingredient_id', $ingredient->id)->first();
+        if (!$ingredientWarehouse) {
             $ingredient->delete();
             return ApiResponse::success();
         } else {
