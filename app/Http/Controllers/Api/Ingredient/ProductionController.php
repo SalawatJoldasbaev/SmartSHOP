@@ -92,7 +92,7 @@ class ProductionController extends Controller
         $final = [];
         $used_ingredients = [];
         $production = true;
-        foreach ($request->all() as $item) {
+        foreach ($request['products'] as $item) {
             $ingredients = IngredientProduct::where('product_id', $item['product_id'])->get(['ingredient_id as id', 'count']);
             $product = Product::find($item['product_id']);
             $temp = [
@@ -172,25 +172,54 @@ class ProductionController extends Controller
             $temp = [
                 'basket_id'=> $basket->id,
                 'deadline'=> $basket->deadline,
-                'orders'=>[]
             ];
-            foreach ($basket->orders as $order) {
-                $ingredients = [];
-                foreach ($order->ingredients as $ingredient) {
-                    $ingredients[] = [
-                        'ingredient_id'=> $ingredient['ingredient_id'],
-                        'ingredient_name'=> Ingredient::where('id', $ingredient['ingredient_id'])->withTrashed()->first()->name,
-                        'price'=> $ingredient['price'],
-                        'count'=> $ingredient['count']
-                    ];
-                }
-                $temp['orders'][] = [
-                    'product_id'=> $order->product_id,
-                    'count'=> $order->count,
-                    'ingredients'=> $ingredients
+            $final['data'][] = $temp;
+        }
+        return ApiResponse::success(data:$final);
+    }
+
+    public function histories(Request $request)
+    {
+        $baskets = IngredientBasket::where('active', false)->paginate(30);
+        $final = [
+            'last_page'=> $baskets->lastPage(),
+            'data'=>[]
+        ];
+
+        foreach ($baskets as $basket) {
+            $temp = [
+                'basket_id'=> $basket->id,
+                'deadline'=> $basket->deadline,
+            ];
+            $final['data'][] = $temp;
+        }
+        return ApiResponse::success(data:$final);
+    }
+    public function finshed(IngredientBasket $basket)
+    {
+        $basket->update([
+            'active'=> false
+        ]);
+        return ApiResponse::success();
+    }
+    public function orders(IngredientBasket $basket)
+    {
+        $final = [];
+        foreach ($basket->orders as $order) {
+            $ingredients = [];
+            foreach ($order->ingredients as $ingredient) {
+                $ingredients[] = [
+                    'ingredient_id'=> $ingredient['ingredient_id'],
+                    'ingredient_name'=> Ingredient::where('id', $ingredient['ingredient_id'])->withTrashed()->first()->name,
+                    'price'=> $ingredient['price'],
+                    'count'=> $ingredient['count']
                 ];
             }
-            $final['data'][] = $temp;
+            $final[] = [
+                'product_id'=> $order->product_id,
+                'count'=> $order->count,
+                'ingredients'=> $ingredients
+            ];
         }
         return ApiResponse::success(data:$final);
     }
