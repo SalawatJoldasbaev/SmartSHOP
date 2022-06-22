@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api\Ingredient;
 
-use App\Http\Controllers\Api\V1\ApiResponse;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\ProductionCreateBasketRequest;
-use App\Http\Requests\ProductionRequest;
+use App\Models\Unit;
+use App\Models\Product;
+use App\Models\Currency;
 use App\Models\Ingredient;
-use App\Models\IngredientBasket;
+use Illuminate\Http\Request;
 use App\Models\IngredientOrder;
+use App\Models\IngredientBasket;
 use App\Models\IngredientProduct;
 use App\Models\IngredientWarehouse;
-use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductionRequest;
+use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Http\Requests\ProductionCreateBasketRequest;
 
 class ProductionController extends Controller
 {
@@ -220,6 +222,56 @@ class ProductionController extends Controller
                 'ingredients'=> $ingredients
             ];
         }
+        return ApiResponse::success(data:$final);
+    }
+
+    public function products(Request $request)
+    {
+        $category_id = $request->category_id;
+        $search = $request->search;
+        $products = Product::when($category_id, function ($query) use ($category_id) {
+            $query->where('category_id', $category_id);
+        })->when($search, function ($query) use ($search) {
+            if ($search[0] == '#') {
+                $search = str_replace('#', '', $search);
+                $query->where('id', $search);
+            } else {
+                $query->where('name', 'like', '%' . $search . '%');
+            }
+        })->whereHas('Ingredients', function ($query) {
+            return $query;
+        })->orderBy('id', 'desc');
+        $products = $products->paginate(30);
+        $final = [
+            'current_page' => $products->currentPage(),
+            'per_page' => $products->perPage(),
+            'last_page' => $products->lastPage(),
+            'data' => [],
+        ];
+        $temp = [];
+        $currency = Currency::all();
+        $units = Unit::all();
+        foreach ($products as $product) {
+            $cost_price = $currency->where('id', $product->cost_price['currency_id'])->first();
+            $min_price =  $currency->where('id', $product->min_price['currency_id'])->first();
+            $max_price =  $currency->where('id', $product->max_price['currency_id'])->first();
+            $whole_price =  $currency->where('id', $product->whole_price['currency_id'])->first();
+            $id = $product->id;
+            $unit = $units->where('id', $product->warehouse?->unit_id)->first();
+            $category = $product->category;
+            $temp = [
+                'id' => $id,
+                'category' => [
+                    'id' => $product->category_id,
+                    'name'=> $category->name
+                ],
+                'image' => $product->image,
+                'name' => $product->name,
+                'brand' => $product->brand,
+            ];
+            $final['data'][] = $temp;
+        }
+
         return ApiResponse::success(data:$final);
     }
 }

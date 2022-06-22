@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/category', [CategoryController::class, 'update']);
     Route::get('/categories', [CategoryController::class, 'index']);
     //product
+    Route::get('/products/ingredient', [ProductionController::class, 'products']);
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products/export', [ProductExcelController::class, 'export']);
     Route::post('/products/import', [ProductExcelController::class, 'import']);
