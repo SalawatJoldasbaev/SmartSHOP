@@ -77,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/histories', 'histories');
     });
     Route::post('/production', [ProductionController::class, 'Production']);
+    Route::post('/production/calculator', [ProductionController::class, 'calculator']);
     Route::post('/production/create', [ProductionController::class, 'createBasket']);
     Route::get('/production/baskets', [ProductionController::class, 'baskets']);
     Route::get('/production/histories', [ProductionController::class, 'histories']);

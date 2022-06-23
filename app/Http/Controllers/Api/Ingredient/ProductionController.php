@@ -78,6 +78,44 @@ class ProductionController extends Controller
         return $final;
     }
 
+    public function calculator(ProductionRequest $request)
+    {
+        $final = [];
+        $ingredientsList = [];
+        foreach ($request->all() as $item) {
+            $ingredients = IngredientProduct::where('product_id', $item['product_id'])->get(['ingredient_id as id', 'count']);
+            $product = Product::find($item['product_id']);
+            $temp = [
+                'product_id'=> $product->id,
+                'product_name'=> $product->name,
+                'count'=> $item['count'],
+                'ingredients'=>[]
+            ];
+            for ($i = 0; $i < count($ingredients); $i++) {
+                $ingredient = $ingredients[$i];
+                $qty = $ingredient->count*$item['count'];
+                $ingredientDB = Ingredient::find($ingredient->id);
+                $temp['ingredients'][] = [
+                    'ingredient_id'=> $ingredient->id,
+                    'ingredient_name'=>$ingredientDB->name,
+                    'count'=> $qty,
+                ];
+                if (isset($ingredientsList[$ingredient->id])) {
+                    $ingredientsList[$ingredient->id]['count'] += $qty;
+                } else {
+                    $ingredientsList[$ingredient->id] =[
+                        'ingredient_id'=> $ingredient->id,
+                        'ingredient_name'=>$ingredientDB->name,
+                        'count'=> $qty,
+                    ];
+                }
+            }
+            $final['products'][] = $temp;
+        }
+        $final['ingredient_list'] = array_values($ingredientsList);
+        return ApiResponse::success(data:$final);
+    }
+
     private function cal(&$qty, &$used_ingredients, $product, $ingredient, $min= null)
     {
         if (isset($used_ingredients[$product->id][$ingredient->id])) {
@@ -209,14 +247,17 @@ class ProductionController extends Controller
         }
         return ApiResponse::success(data:$final);
     }
+
     public function baskets(Request $request)
     {
         return $this->basketsData($request, true);
     }
+
     public function histories(Request $request)
     {
         return $this->basketsData($request, false);
     }
+
     public function finshed(IngredientBasket $basket)
     {
         $basket->update([
