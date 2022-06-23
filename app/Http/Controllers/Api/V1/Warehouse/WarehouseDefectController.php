@@ -12,7 +12,7 @@ use App\Models\WarehouseHistoryItem;
 use App\Models\WarehouseHistoryBasket;
 use App\Http\Controllers\Api\V1\ApiResponse;
 
-class WrehouseDefectController extends Controller
+class WarehouseDefectController extends Controller
 {
     public function Defect(DefectRequest $request)
     {

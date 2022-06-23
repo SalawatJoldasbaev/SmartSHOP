@@ -25,7 +25,7 @@ use App\Http\Controllers\Api\V1\Employee\EmployeeController;
 use App\Http\Controllers\Api\V1\Order\ReturnOrderController;
 use App\Http\Controllers\Api\V1\Warehouse\ReturnProductController;
 use App\Http\Controllers\Api\V1\Warehouse\WarehouseController;
-use App\Http\Controllers\Api\V1\Warehouse\WrehouseDefectController;
+use App\Http\Controllers\Api\V1\Warehouse\WarehouseDefectController;
 
 Route::post('/login', [EmployeeController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
@@ -91,8 +91,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/warehouse/return', [ReturnProductController::class, 'returnProduct']);
     Route::get('/warehouse/return/history', [ReturnProductController::class, 'show']);
     Route::get('/warehouse/low-products', [WarehouseController::class, 'less']);
-    Route::post('/warehouse/defect', [WrehouseDefectController::class, 'Defect']);
-    Route::get('/warehouse/defect', [WrehouseDefectController::class, 'ShowDefects']);
+    Route::post('/warehouse/defect', [WarehouseDefectController::class, 'Defect']);
+    Route::get('/warehouse/defect', [WarehouseDefectController::class, 'ShowDefects']);
 
     Route::post('/order', [OrderController::class, 'create']);
     Route::get('/baskets', [BasketController::class, 'index']);

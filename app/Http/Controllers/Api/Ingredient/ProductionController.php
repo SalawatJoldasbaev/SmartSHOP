@@ -144,14 +144,14 @@ class ProductionController extends Controller
             'active'=> true
         ]);
         foreach ($final as $itemFinal) {
-            foreach ($itemFinal['ingredients'] as $itemIngredient) {
+            foreach ($itemFinal['ingredients'] as $key=>$itemIngredient) {
                 $warehouse = IngredientWarehouse::find($itemIngredient['warehouse_id']);
                 if ($warehouse->count -  $itemIngredient['count'] == 0) {
                     $warehouse->active = false;
                 }
                 $warehouse->count = $warehouse->count -  $itemIngredient['count'];
                 $warehouse->save();
-                $itemIngredient['usd_rate'] = $warehouse->basket->usd_rate;
+                $itemFinal['ingredients'][$key]['usd_rate'] = $warehouse->basket->usd_rate;
             }
             IngredientOrder::create([
                 'ingredient_basket_id'=> $basket->id,
@@ -163,30 +163,36 @@ class ProductionController extends Controller
         return ApiResponse::success();
     }
 
-    public function baskets(Request $request)
+    private function basketsData(Request $request, $active)
     {
-        $baskets = IngredientBasket::where('active', true)->paginate(15);
+        $baskets = IngredientBasket::where('active', $active)->paginate(10);
         $final = [
             'last_page'=> $baskets->lastPage(),
+            'per_page'=> $baskets->perPage(),
             'data'=>[]
         ];
 
         foreach ($baskets as $basket) {
             $orders = [];
+            $sum = 0;
             foreach ($basket->orders as $order) {
                 $ingredients = [];
+                $product_sum = 0;
                 foreach ($order->ingredients as $ingredient) {
                     $ingredients[] = [
                         'ingredient_id'=> $ingredient['ingredient_id'],
                         'ingredient_name'=> Ingredient::where('id', $ingredient['ingredient_id'])->withTrashed()->first()->name,
-                        'usd_rate'=> 11000,
+                        'count'=> $ingredient['count'],
+                        'usd_rate'=> $ingredient['usd_rate'],
                         'price'=> $ingredient['price'],
-                        'count'=> $ingredient['count']
                     ];
+                    $product_sum += ($ingredient['price']*$ingredient['count'])* $ingredient['usd_rate'];
+                    $sum += ($ingredient['price']*$ingredient['count'])* $ingredient['usd_rate'];
                 }
                 $orders[] = [
                     'product_id'=> $order->product_id,
-                    'product_name'=> $order->product->namecd,
+                    'product_name'=> $order->product->name,
+                    'sum'=> $product_sum,
                     'count'=> $order->count,
                     'ingredients'=> $ingredients
                 ];
@@ -195,7 +201,7 @@ class ProductionController extends Controller
             $temp = [
                 'basket_id'=> $basket->id,
                 'deadline'=> $basket->deadline,
-
+                'sum'=> $sum,
                 'orders'=> $orders
             ];
 
@@ -203,22 +209,13 @@ class ProductionController extends Controller
         }
         return ApiResponse::success(data:$final);
     }
-
+    public function baskets(Request $request)
+    {
+        return $this->basketsData($request, true);
+    }
     public function histories(Request $request)
     {
-        $baskets = IngredientBasket::where('active', false)->paginate(30);
-        $final = [
-            'last_page'=> $baskets->lastPage(),
-            'data'=>[]
-        ];
-
-        foreach ($baskets as $basket) {
-            $final['data'][] = [
-                'basket_id'=> $basket->id,
-                'deadline'=> $basket->deadline,
-            ];
-        }
-        return ApiResponse::success(data:$final);
+        return $this->basketsData($request, false);
     }
     public function finshed(IngredientBasket $basket)
     {
