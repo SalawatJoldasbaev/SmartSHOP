@@ -14,7 +14,9 @@ use App\Models\IngredientWarehouse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductionRequest;
 use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Http\Controllers\Api\V1\Warehouse\WarehouseController;
 use App\Http\Requests\ProductionCreateBasketRequest;
+use App\Src\WarehouseLogic;
 
 class ProductionController extends Controller
 {
@@ -204,6 +206,7 @@ class ProductionController extends Controller
     private function basketsData(Request $request, $active)
     {
         $baskets = IngredientBasket::where('active', $active)->paginate(10);
+        // return $baskets;
         $final = [
             'last_page'=> $baskets->lastPage(),
             'per_page'=> $baskets->perPage(),
@@ -258,11 +261,33 @@ class ProductionController extends Controller
         return $this->basketsData($request, false);
     }
 
-    public function finshed(IngredientBasket $basket)
+    public function finshed(Request $request, IngredientBasket $basket)
     {
+        if ($basket->active != true) {
+            return ApiResponse::error('not found basket', 404);
+        }
         $basket->update([
             'active'=> false
         ]);
+        $products = [];
+        foreach ($basket->orders as $order) {
+            $product_sum = 0;
+            foreach ($order->ingredients as $ingredient) {
+                $product_sum += ($ingredient['price']*IngredientProduct::where('product_id', $order->product_id)->where('ingredient_id', $ingredient['ingredient_id'])->first()->count);
+            }
+            $products[] = [
+                'product_id'=> $order->product_id,
+                'count'=> $order->count,
+                'unit_id'=> 1,
+                'price'=> [
+                    'currency_id'=> 2,
+                    'price'=> $product_sum,
+                ]
+            ];
+        }
+
+        $warehouse = new WarehouseLogic();
+        $warehouse->SetWarehouse(new Request($products));
         return ApiResponse::success();
     }
     public function orders(IngredientBasket $basket)

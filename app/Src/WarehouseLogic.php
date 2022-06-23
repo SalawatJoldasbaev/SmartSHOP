@@ -8,15 +8,16 @@ use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\WarehouseBasket;
 use App\Models\WarehouseOrder;
+use Auth;
 use Carbon\Carbon;
 
 class WarehouseLogic
 {
-    public function SetWarehouse($data)
+    public function SetWarehouse($data, $id = null)
     {
         $date = Carbon::today()->format('Y-m-d');
         $basket = WarehouseBasket::create([
-            'employee_id' => $data->user()->id,
+            'employee_id' => $data->user()?->id ?? Auth::user()->id,
             'date' => $date,
         ]);
         $data = $data->all();
