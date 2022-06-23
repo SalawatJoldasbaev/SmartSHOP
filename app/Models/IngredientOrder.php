@@ -14,4 +14,9 @@ class IngredientOrder extends Model
     protected $casts = [
         'ingredients'=> 'json'
     ];
+
+    public function Product()
+    {
+        return $this->hasOne(Product::class, 'id', 'product_id');
+    }
 }

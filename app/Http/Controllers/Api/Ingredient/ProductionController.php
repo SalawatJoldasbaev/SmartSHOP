@@ -218,6 +218,7 @@ class ProductionController extends Controller
             }
             $final[] = [
                 'product_id'=> $order->product_id,
+                'product_name'=> $order->product->name,
                 'count'=> $order->count,
                 'ingredients'=> $ingredients
             ];
@@ -249,15 +250,8 @@ class ProductionController extends Controller
             'data' => [],
         ];
         $temp = [];
-        $currency = Currency::all();
-        $units = Unit::all();
         foreach ($products as $product) {
-            $cost_price = $currency->where('id', $product->cost_price['currency_id'])->first();
-            $min_price =  $currency->where('id', $product->min_price['currency_id'])->first();
-            $max_price =  $currency->where('id', $product->max_price['currency_id'])->first();
-            $whole_price =  $currency->where('id', $product->whole_price['currency_id'])->first();
             $id = $product->id;
-            $unit = $units->where('id', $product->warehouse?->unit_id)->first();
             $category = $product->category;
             $temp = [
                 'id' => $id,
