@@ -144,12 +144,6 @@ class ProductionController extends Controller
             'active'=> true
         ]);
         foreach ($final as $itemFinal) {
-            IngredientOrder::create([
-                'ingredient_basket_id'=> $basket->id,
-                'product_id'=> $itemFinal['product_id'],
-                'count'=> $itemFinal['count'],
-                'ingredients'=> $itemFinal['ingredients']
-            ]);
             foreach ($itemFinal['ingredients'] as $itemIngredient) {
                 $warehouse = IngredientWarehouse::find($itemIngredient['warehouse_id']);
                 if ($warehouse->count -  $itemIngredient['count'] == 0) {
@@ -157,24 +151,54 @@ class ProductionController extends Controller
                 }
                 $warehouse->count = $warehouse->count -  $itemIngredient['count'];
                 $warehouse->save();
+                $itemIngredient['usd_rate'] = $warehouse->basket->usd_rate;
             }
+            IngredientOrder::create([
+                'ingredient_basket_id'=> $basket->id,
+                'product_id'=> $itemFinal['product_id'],
+                'count'=> $itemFinal['count'],
+                'ingredients'=> $itemFinal['ingredients']
+            ]);
         }
         return ApiResponse::success();
     }
 
     public function baskets(Request $request)
     {
-        $baskets = IngredientBasket::where('active', true)->paginate(30);
+        $baskets = IngredientBasket::where('active', true)->paginate(15);
         $final = [
             'last_page'=> $baskets->lastPage(),
             'data'=>[]
         ];
 
         foreach ($baskets as $basket) {
+            $orders = [];
+            foreach ($basket->orders as $order) {
+                $ingredients = [];
+                foreach ($order->ingredients as $ingredient) {
+                    $ingredients[] = [
+                        'ingredient_id'=> $ingredient['ingredient_id'],
+                        'ingredient_name'=> Ingredient::where('id', $ingredient['ingredient_id'])->withTrashed()->first()->name,
+                        'usd_rate'=> 11000,
+                        'price'=> $ingredient['price'],
+                        'count'=> $ingredient['count']
+                    ];
+                }
+                $orders[] = [
+                    'product_id'=> $order->product_id,
+                    'product_name'=> $order->product->namecd,
+                    'count'=> $order->count,
+                    'ingredients'=> $ingredients
+                ];
+            }
+
             $temp = [
                 'basket_id'=> $basket->id,
                 'deadline'=> $basket->deadline,
+
+                'orders'=> $orders
             ];
+
             $final['data'][] = $temp;
         }
         return ApiResponse::success(data:$final);
@@ -218,7 +242,7 @@ class ProductionController extends Controller
             }
             $final[] = [
                 'product_id'=> $order->product_id,
-                'product_name'=> $order->product->name,
+                'product_name'=> $order->product->namecd,
                 'count'=> $order->count,
                 'ingredients'=> $ingredients
             ];
