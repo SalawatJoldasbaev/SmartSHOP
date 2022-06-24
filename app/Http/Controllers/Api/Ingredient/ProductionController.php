@@ -100,6 +100,7 @@ class ProductionController extends Controller
                 $temp['ingredients'][] = [
                     'ingredient_id'=> $ingredient->id,
                     'ingredient_name'=>$ingredientDB->name,
+                    'unit_id'=>$ingredientDB->unit_id,
                     'count'=> $qty,
                 ];
                 if (isset($ingredientsList[$ingredient->id])) {
@@ -206,7 +207,6 @@ class ProductionController extends Controller
     private function basketsData(Request $request, $active)
     {
         $baskets = IngredientBasket::where('active', $active)->paginate(10);
-        // return $baskets;
         $final = [
             'last_page'=> $baskets->lastPage(),
             'per_page'=> $baskets->perPage(),
