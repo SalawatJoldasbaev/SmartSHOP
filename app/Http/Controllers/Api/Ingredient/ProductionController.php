@@ -39,10 +39,12 @@ class ProductionController extends Controller
                 $qty = $ingredient->count*$item['count'];
                 $warehouse = $warehouses->where('count', '!=', 0)->where('ingredient_id', $ingredient->id)->first();
                 if (!$warehouse) {
+                    $ingredientDB  = Ingredient::find($ingredient->id);
                     $temp['ingredients'][] = [
                         'warehouse_id'=> 0,
                         'ingredient_id'=> $ingredient->id,
-                        'ingredient_name'=> Ingredient::find($ingredient->id)->name,
+                        'ingredient_name'=> $ingredientDB->name,
+                        'unit_id'=> $ingredientDB->unit_id,
                         'count'=> isset($used_ingredients[$product->id][$ingredient->id]) ?$qty-$used_ingredients[$product->id][$ingredient->id]: $qty,
                         'price'=> 0,
                         'ordered_at'=> null,
@@ -232,7 +234,7 @@ class ProductionController extends Controller
                 }
                 $orders[] = [
                     'product_id'=> $order->product_id,
-                    'product_name'=> $order->product->name,
+                    'product_name'=> $order->product()->withTrashed()->first()->name,
                     'sum'=> $product_sum,
                     'count'=> $order->count,
                     'ingredients'=> $ingredients
