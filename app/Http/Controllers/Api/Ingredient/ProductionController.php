@@ -307,7 +307,7 @@ class ProductionController extends Controller
             }
             $final[] = [
                 'product_id'=> $order->product_id,
-                'product_name'=> $order->product->namecd,
+                'product_name'=> $order->product()->withTrashed()->first()->name,
                 'count'=> $order->count,
                 'ingredients'=> $ingredients
             ];
