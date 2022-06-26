@@ -235,6 +235,7 @@ class ProductionController extends Controller
                 $orders[] = [
                     'product_id'=> $order->product_id,
                     'product_name'=> $order->product()->withTrashed()->first()->name,
+                    'category_name'=> $order->product()->withTrashed()->first()->category()->withTrashed()->first()->name,
                     'sum'=> $product_sum,
                     'count'=> $order->count,
                     'ingredients'=> $ingredients
@@ -308,6 +309,7 @@ class ProductionController extends Controller
             $final[] = [
                 'product_id'=> $order->product_id,
                 'product_name'=> $order->product()->withTrashed()->first()->name,
+                'category_name'=> $order->product()->withTrashed()->first()->category()->withTrashed()->first()->name,
                 'count'=> $order->count,
                 'ingredients'=> $ingredients
             ];
