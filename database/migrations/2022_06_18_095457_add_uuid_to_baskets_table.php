@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up():void
     {
         Schema::table('baskets', function (Blueprint $table) {
-            $table->uuid()->after('status')->nullable()->unique();
+            $table->uuid()->after('status')->nullable();
         });
     }
 

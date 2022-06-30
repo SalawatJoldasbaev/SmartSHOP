@@ -165,14 +165,14 @@ class ProductController extends Controller
                     'code' => $whole_price->code,
                     'price' => $product->whole_price['price'],
                 ],
-                'warehouse' => isset($product->warehouse) ? [
+                'warehouse' => [
                     'unit' => [
                         'id' => $unit->id,
                         'name' => $unit->name,
                         'code' => $unit->unit,
                     ],
-                    'count' => $product->warehouse->count,
-                ] : null,
+                    'count' => $product->warehouse?->count,
+                ],
                 'qr_code_link' =>  route('qrcode', [
                     'uuid' => $product->uuid,
                     'type' => 'product',

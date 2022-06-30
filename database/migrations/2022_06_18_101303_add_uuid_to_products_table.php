@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up():void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->uuid()->after('whole_price')->nullable()->unique();
+            $table->uuid()->after('whole_price')->nullable();
         });
     }
 
