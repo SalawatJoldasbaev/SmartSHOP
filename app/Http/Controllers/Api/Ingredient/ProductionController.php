@@ -222,9 +222,11 @@ class ProductionController extends Controller
                 $ingredients = [];
                 $product_sum = 0;
                 foreach ($order->ingredients as $ingredient) {
+                    $ingredientDB = Ingredient::where('id', $ingredient['ingredient_id'])->withTrashed()->first();
                     $ingredients[] = [
                         'ingredient_id'=> $ingredient['ingredient_id'],
-                        'ingredient_name'=> Ingredient::where('id', $ingredient['ingredient_id'])->withTrashed()->first()->name,
+                        'ingredient_name'=> $ingredientDB->name,
+                        'unit_id'=> $ingredientDB->unit_id,
                         'count'=> $ingredient['count'],
                         'usd_rate'=> $ingredient['usd_rate'],
                         'price'=> $ingredient['price'],
