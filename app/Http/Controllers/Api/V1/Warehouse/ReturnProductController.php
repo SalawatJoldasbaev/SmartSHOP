@@ -34,9 +34,6 @@ class ReturnProductController extends Controller
         foreach ($defetives as $item) {
             $warehouse = Warehouse::where('product_id', $item['product_id'])->active()->first();
             $warehouse->count -= $item['count'];
-            if ($warehouse->count == 0) {
-                $warehouse->active = false;
-            }
             $warehouse->save();
             WarehouseHistoryItem::create([
                 'warehouse_history_basket_id' => $basket->id,
