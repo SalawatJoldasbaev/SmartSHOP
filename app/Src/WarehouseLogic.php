@@ -40,42 +40,11 @@ class WarehouseLogic
                 'code' => $code,
             ]);
 
-            $min = $productModel['min_price'];
-            if ($min['currency_id'] == 2) {
-                $min['price'] = $cost['price'] * $category['min_percent'] / 100 + $cost['price'];
-            } else {
-                if ($cost['currency_id'] == 2) {
-                    $min['price'] = floor(((($cost['price'] * $category['min_percent'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
-                } else {
-                    $min['price'] = $cost['price'] * $category['min_percent'] / 100 + $cost['price'];
-                }
-            }
-            $max = $productModel['max_price'];
-            if ($max['currency_id'] == 2) {
-                $max['price'] = $cost['price'] * $category['max_percent'] / 100 + $cost['price'];
-            } else {
-                if ($cost['currency_id'] == 2) {
-                    $max['price'] = floor(((($cost['price'] * $category['max_percent'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
-                } else {
-                    $max['price'] = $cost['price'] * $category['max_percent'] / 100 + $cost['price'];
-                }
-            }
-            $whole = $productModel['whole_price'];
-            if ($whole['currency_id'] == 2) {
-                $whole['price'] = $cost['price'] * $category['whole_percent'] / 100 + $cost['price'];
-            } else {
-                if ($cost['currency_id'] == 2) {
-                    $whole['price'] = floor(((($cost['price'] * $category['whole_percent'] / 100 + $cost['price']) * $usdToUzs->rate + 500) / 1000)) * 1000;
-                } else {
-                    $whole['price'] = $cost['price'] * $category['whole_percent'] / 100 + $cost['price'];
-                }
-            }
-
             $productModel->update([
                 'cost_price' => $cost,
-                'min_price' => $min,
-                'max_price' => $max,
-                'whole_price' => $whole,
+                'min_price' => $product['min_price'],
+                'max_price' => $product['max_price'],
+                'whole_price' => $product['whole_price'],
             ]);
 
             $createCode = Code::create([

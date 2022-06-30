@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Warehouse;
 
 use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\WarehouseAddRequest;
 use App\Models\Warehouse;
 use App\Src\WarehouseLogic;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class WarehouseController extends Controller
     {
         $this->warehouseLogic = new WarehouseLogic();
     }
-    public function create(Request $request)
+    public function create(WarehouseAddRequest $request)
     {
         $this->warehouseLogic->SetWarehouse($request);
         return ApiResponse::success();
