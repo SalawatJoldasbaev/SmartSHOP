@@ -66,16 +66,16 @@ class PaymentController extends Controller
         $balance['card'] += $card;
         $balance['cash'] += $cash;
         $balance['sum'] += $sum;
-        // PaymentHistory::create([
-        //     'basket_id' => $basket->id,
-        //     'employee_id' => $request->user()->id ?? $request->employee_id,
-        //     'user_id' => $basket->user_id,
-        //     'amount_paid' => [
-        //         'card' => $card,
-        //         'cash' => $cash,
-        //     ],
-        //     'paid_time' => Carbon::now(),
-        // ]);
+        PaymentHistory::create([
+            'basket_id' => $basket->id,
+            'employee_id' => $request->user()->id ?? $request->employee_id,
+            'user_id' => $basket->user_id,
+            'amount_paid' => [
+                'card' => $card,
+                'cash' => $cash,
+            ],
+            'paid_time' => Carbon::now(),
+        ]);
         if (array_sum($remaining_sum) > 0) {
             $remaining_basket = Basket::where('user_id', $basket->user_id)->where('debt->remaining', '>', 0)->whereNot('id', $basket->id)->first();
             if ($remaining_basket) {
