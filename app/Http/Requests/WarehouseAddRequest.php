@@ -27,24 +27,24 @@ class WarehouseAddRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_id'=> 'required|exists:products,id',
-            'count'=> 'required',
-            'unit_id'=> 'required|exists:units,id',
-            'price'=> 'required|array',
-            'price.currency_id'=> 'required|exists:currencies,id',
-            'price.price'=> 'required',
+            '*.product_id' => 'required|exists:products,id',
+            '*.count' => 'required',
+            '*.unit_id' => 'required|exists:units,id',
+            '*.price' => 'required|array',
+            '*.price.currency_id' => 'required|exists:currencies,id',
+            '*.price.price' => 'required',
 
-            'max_price'=> 'required|array',
-            'max_price.currency_id'=> 'required|exists:currencies,id',
-            'max_price.price'=> 'required',
+            '*.max_price' => 'required|array',
+            '*.max_price.currency_id' => 'required|exists:currencies,id',
+            '*.max_price.price' => 'required',
 
-            'min_price'=> 'required|array',
-            'min_price.currency_id'=> 'required|exists:currencies,id',
-            'min_price.price'=> 'required',
+            '*.min_price' => 'required|array',
+            '*.min_price.currency_id' => 'required|exists:currencies,id',
+            '*.min_price.price' => 'required',
 
-            'whole_price'=> 'required|array',
-            'whole_price.currency_id'=> 'required|exists:currencies,id',
-            'whole_price.price'=> 'required',
+            '*.whole_price' => 'required|array',
+            '*.whole_price.currency_id' => 'required|exists:currencies,id',
+            '*.whole_price.price' => 'required',
         ];
     }
     public function failedValidation(Validator $validator)
