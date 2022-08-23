@@ -122,7 +122,7 @@
             "label": "Islep shig'ariw",
             "path": "",
             "icon": "bx bx-purchase-tag-alt",
-            "disabled": true,
+            "disabled": false,
             "submenu": [
                 {
                     "id": "subitem10",
@@ -358,7 +358,8 @@
 
   "production__process": "Islep shig'ariw procesi",
   "production__history": "Islep shig'ariw tariyxi",
-  "faqat_ishlab_chiqarish_mumkin": "Iltimas!, tek g'ana islep shig'ariw mu'mkin bolg'an o'nimlerdi qaldirin'!"
+  "faqat_ishlab_chiqarish_mumkin": "Iltimas!, tek g'ana islep shig'ariw mu'mkin bolg'an o'nimlerdi qaldirin'!",
+  "process__end": "Processdi tawisiwdi qaleyiszbe?"
 
 
 
