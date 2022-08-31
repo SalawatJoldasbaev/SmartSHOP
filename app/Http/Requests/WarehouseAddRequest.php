@@ -28,7 +28,7 @@ class WarehouseAddRequest extends FormRequest
     {
         return [
             '*.product_id' => 'required|exists:products,id',
-            '*.count' => 'required',
+            '*.count' => 'required|numeric|min:0',
             '*.unit_id' => 'required|exists:units,id',
             '*.price' => 'required|array',
             '*.price.currency_id' => 'required|exists:currencies,id',

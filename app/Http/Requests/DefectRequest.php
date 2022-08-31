@@ -28,7 +28,7 @@ class DefectRequest extends FormRequest
     {
         return [
             '*.product_id' => 'required|exists:products,id',
-            '*.count' => 'required',
+            '*.count' => 'required|numeric|min:1',
         ];
     }
 
