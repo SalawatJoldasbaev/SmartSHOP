@@ -21,7 +21,7 @@ class ProductController extends Controller
     {
         try {
             $this->authorize('create', Product::class);
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             return ApiResponse::error('This action is unauthorized.', 403);
         }
 
@@ -80,7 +80,7 @@ class ProductController extends Controller
                 'warehouse_id' => $warhouse->id,
             ]);
         }
-        return ApiResponse::success(data:$product);
+        return ApiResponse::success(data: $product);
     }
 
     public function index(Request $request)
@@ -167,9 +167,9 @@ class ProductController extends Controller
                 ],
                 'warehouse' => [
                     'unit' => [
-                        'id' => $unit->id,
-                        'name' => $unit->name,
-                        'code' => $unit->unit,
+                        'id' => $unit?->id,
+                        'name' => $unit?->name,
+                        'code' => $unit?->unit,
                     ],
                     'count' => $product->warehouse?->count,
                 ],
@@ -181,14 +181,14 @@ class ProductController extends Controller
             ];
             $final['data'][] = $temp;
         }
-        return ApiResponse::success(data:$final);
+        return ApiResponse::success(data: $final);
     }
 
     public function update(Request $request)
     {
         try {
             $this->authorize('update', Product::class);
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             return ApiResponse::error('This action is unauthorized.', 403);
         }
 
@@ -211,7 +211,7 @@ class ProductController extends Controller
 
         try {
             $product = Product::findOrFail($request->product_id);
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             return ApiResponse::error('product not found', 404);
         }
         $product->update([
@@ -231,7 +231,7 @@ class ProductController extends Controller
     {
         try {
             $this->authorize('delete', Product::class);
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             return ApiResponse::error('This action is unauthorized.', 403);
         }
 
