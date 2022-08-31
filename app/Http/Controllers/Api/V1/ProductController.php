@@ -39,7 +39,7 @@ class ProductController extends Controller
             'price_wholesale.currency_id' => 'required|exists:currencies,id',
             'warehouse' => 'nullable|array',
             'warehouse.unit_id' => 'required_unless:warehouse,null|exists:units,id',
-            'warehouse.count' => 'required_unless:warehouse,null',
+            'warehouse.count' => 'required_unless:warehouse,null|numeric|min:0',
         ]);
         if ($validation->fails()) {
             return ApiResponse::error($validation->errors()->first(), 422);
