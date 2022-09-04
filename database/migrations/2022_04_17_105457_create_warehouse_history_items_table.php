@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Branch;
 use App\Models\Product;
 use App\Models\WarehouseHistoryBasket;
 use Illuminate\Support\Facades\Schema;

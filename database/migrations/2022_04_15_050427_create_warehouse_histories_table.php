@@ -1,10 +1,11 @@
 <?php
 
+use App\Models\Branch;
 use App\Models\WarehouseBasket;
 use App\Models\WarehouseHistoryBasket;
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -12,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('warehouse_histories', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(Branch::class);
             $table->foreignIdFor(WarehouseHistoryBasket::class);
             $table->foreignIdFor(\App\Models\Employee::class);
             $table->text('description')->nullable();

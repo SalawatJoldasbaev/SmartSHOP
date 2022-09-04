@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
-Route::get('/migrate', function () {
-    Artisan::call('migrate:fresh');
-    return "okay";
-});
+// Route::get('/migrate', function () {
+//     Artisan::call('migrate:fresh');
+//     return "okay";
+// });
 
 Route::get('/{route?}', function () {
     return view('welcome');
