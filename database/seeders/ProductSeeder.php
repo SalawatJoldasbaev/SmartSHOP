@@ -39,6 +39,7 @@ class ProductSeeder extends Seeder
         ]);
 
         Warehouse::create([
+            'branch_id' => 1,
             'product_id' => 1,
             'unit_id' => 1,
             'count' => 350,

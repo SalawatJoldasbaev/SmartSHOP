@@ -18,18 +18,42 @@ class WarehouseController extends Controller
     }
     public function create(WarehouseAddRequest $request)
     {
-        $this->warehouseLogic->SetWarehouse($request);
-        return ApiResponse::success();
+        $employee = $request->user();
+        if ($employee->branch->is_main === true) {
+            $this->warehouseLogic->SetWarehouse($request);
+            return ApiResponse::success();
+        } else {
+            return ApiResponse::error('your not allowed', 403);
+        }
     }
 
     public function index(Request $request)
     {
-        $warehouse = $this->warehouseLogic->getWarehouse(search:$request->search ?? null, category_id:$request->category_id);
+        $employee = $request->user();
+        $branch_id = $request->branch_id;
+        if (!$branch_id) {
+            $branch_id = $employee->branch_id;
+        }
+        $warehouse = $this->warehouseLogic->getWarehouse(
+            search:$request->search ?? null,
+            category_id:$request->category_id,
+            branch_id:$branch_id
+        );
         return ApiResponse::success(data:$warehouse);
     }
     public function less(Request $request)
     {
-        $warehouse = $this->warehouseLogic->getWarehouse(search:$request->search ?? null, min_product:true, category_id:$request->category_id);
+        $employee = $request->user();
+        $branch_id = $request->branch_id;
+        if (!$branch_id) {
+            $branch_id = $employee->branch_id;
+        }
+        $warehouse = $this->warehouseLogic->getWarehouse(
+            search:$request->search ?? null,
+            min_product:true,
+            category_id:$request->category_id,
+            branch_id:$branch_id
+        );
         return ApiResponse::success(data:$warehouse);
     }
 

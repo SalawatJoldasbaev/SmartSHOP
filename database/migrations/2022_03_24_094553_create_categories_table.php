@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Category;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,16 +19,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-
-        // Category::create([
-        //     'name' => "Boshqa",
-        //     'min_percent' => 1,
-        //     'max_percent' => 1,
-        //     'whole_percent' => 1,
-        //     'min_product' => 1
-        // ]);
     }
-
 
     public function down(): void
     {

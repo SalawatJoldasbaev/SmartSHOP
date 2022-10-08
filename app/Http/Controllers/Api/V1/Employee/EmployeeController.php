@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Employee;
 
 use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,8 +15,26 @@ class EmployeeController extends Controller
 
     public function index(Request $request)
     {
-        $employees = Employee::all('id', 'avatar', 'name', 'phone', 'salary', 'flex', 'role');
-        return ApiResponse::success(data:$employees);
+        $branches = Branch::all()->collect();
+        $employees = Employee::when($request->branch_id, function ($query, $branch_id) {
+            return $query->where('branch_id', $branch_id);
+        })->when($request->search, function ($query, $search) {
+            return $query->where('name', 'like', "%" . $search . "%")
+                ->orWhere('phone', 'like', "%" . $search . "%");
+        })
+            ->select('id', 'branch_id', 'avatar', 'name', 'phone', 'salary', 'flex', 'role')->get();
+        $final = [];
+        foreach ($employees as $employee) {
+            $branch = $branches->where('id', $employee->branch_id)->first();
+            $final[] = array_merge($employee->toArray(), [
+                'branch' => [
+                    'id' => $branch->id,
+                    'name' => $branch->name,
+                    'is_main' => $branch->is_main,
+                ],
+            ]);
+        }
+        return ApiResponse::success(data:$final);
     }
     public function register(Request $request)
     {
@@ -26,6 +45,7 @@ class EmployeeController extends Controller
         }
 
         $validation = Validator::make($request->all(), [
+            'branch_id' => 'required|exists:branches,id',
             'phone' => 'required|unique:employees,phone',
             'avatar' => 'nullable',
             'name' => 'required|string',
@@ -41,6 +61,7 @@ class EmployeeController extends Controller
         }
 
         Employee::create([
+            'branch_id' => $request->branch_id,
             'avatar' => $request->avatar,
             'name' => $request->name,
             'phone' => $request->phone,
@@ -84,6 +105,11 @@ class EmployeeController extends Controller
             'phone' => $user->phone,
             'name' => $user->name,
             'token' => $token,
+            'branch' => [
+                'id' => $user->branch_id,
+                'name' => $user->branch->name,
+                'is_main' => $user->branch->is_main,
+            ],
         ]);
     }
 
@@ -96,6 +122,7 @@ class EmployeeController extends Controller
         }
 
         $validation = Validator::make($request->all(), [
+            'branch_id' => 'required|exists:branches,id',
             'employee_id' => 'required|exists:employees,id',
             'avatar' => 'nullable',
             'phone' => 'required',
@@ -110,6 +137,7 @@ class EmployeeController extends Controller
         }
         $employee = Employee::find($request->employee_id);
         $data = [
+            'brnach_id' => $request->branch_id,
             'avatar' => $request->avatar,
             'name' => $request->name,
             'phone' => $request->phone,

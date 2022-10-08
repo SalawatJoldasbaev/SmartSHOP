@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\User;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+use App\Models\Branch;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -16,6 +16,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(Branch::class);
             $table->string('full_name');
             $table->string('phone')->unique();
             $table->enum('type', ['Y', 'J']);
@@ -26,12 +27,6 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
-
-        User::create([
-            'full_name' => 'Unknown client',
-            'phone' => '+998901231212',
-            'type' => 'J',
-        ]);
     }
 
     /**

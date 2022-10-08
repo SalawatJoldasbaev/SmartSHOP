@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->boolean('is_main');
             $table->timestamps();
         });
     }
-
 
     public function down(): void
     {

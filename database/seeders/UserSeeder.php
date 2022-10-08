@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -15,6 +14,12 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::factory(30)->create();
+        User::create([
+            'branch_id' => 1,
+            'full_name' => 'Unknown client',
+            'phone' => '+998901231212',
+            'type' => 'J',
+        ]);
+
     }
 }
