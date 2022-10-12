@@ -2,7 +2,6 @@
 
 namespace App\Src;
 
-use App\Models\Code;
 use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\WarehouseBasket;
@@ -20,13 +19,11 @@ class WarehouseLogic
             'branch_id' => $employee->branch_id,
             'employee_id' => $data->user()?->id ?? Auth::user()->id,
             'date' => $date,
+            'status' => 'taken',
         ]);
         $data = $data->all();
         foreach ($data as $product) {
             $warehouse = Warehouse::where('active', true)->where('branch_id', $employee->branch_id)->where('product_id', $product['product_id'])->first();
-            $codes = $warehouse->codes ?? [];
-            $code = Code::newCode();
-            $codes[$code] = $product['count'];
             $productModel = Product::find($product['product_id']);
             $cost = $product['price'];
             $updated_count = ($warehouse->count ?? 0) + $product['count'];
@@ -37,7 +34,6 @@ class WarehouseLogic
                 'product_id' => $product['product_id'],
                 'unit_id' => $product['unit_id'],
                 'count' => $product['count'],
-                'code' => $code,
             ]);
 
             $productModel->update([
@@ -46,22 +42,9 @@ class WarehouseLogic
                 'max_price' => $product['max_price'],
                 'whole_price' => $product['whole_price'],
             ]);
-
-            $createCode = Code::create([
-                'branch_id' => $employee->branch_id,
-                'warehouse_basket_id' => $basket->id,
-                'warehouse_order_id' => $warehouseOrder->id,
-                'product_id' => $product['product_id'],
-                'code' => $code,
-                'cost_price' => $product['price'],
-            ]);
             if ($warehouse and $date == $warehouse->date) {
                 $warehouse->update([
-                    'codes' => $codes,
                     'count' => $updated_count,
-                ]);
-                $createCode->update([
-                    'warehouse_id' => $warehouse->id,
                 ]);
             } else {
                 $new_warehouse = Warehouse::create([
@@ -70,11 +53,7 @@ class WarehouseLogic
                     'unit_id' => $product['unit_id'],
                     'date' => $date,
                     'active' => true,
-                    'codes' => $codes,
                     'count' => $updated_count,
-                ]);
-                $createCode->update([
-                    'warehouse_id' => $new_warehouse->id,
                 ]);
                 $warehouse?->update([
                     'active' => false,

@@ -47,6 +47,14 @@ class EmployeeSeeder extends Seeder
             'pincode' => md5(5882),
             'role' => 'ceo',
         ]);
+        Employee::create([
+            'branch_id' => 1,
+            'name' => 'WarehouseManager',
+            'phone' => '+998953558899',
+            'password' => Hash::make(8899),
+            'pincode' => md5(8899),
+            'role' => 'warehouseManager',
+        ]);
 
     }
 }

@@ -43,7 +43,6 @@ class ProductSeeder extends Seeder
             'product_id' => 1,
             'unit_id' => 1,
             'count' => 350,
-            'codes' => ['ss' => 350],
             'date' => Carbon::today(),
             'active' => true,
         ]);

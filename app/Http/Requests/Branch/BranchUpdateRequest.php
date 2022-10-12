@@ -1,14 +1,13 @@
 <?php
 
-namespace {{ namespace }};
+namespace App\Http\Requests\Branch;
 
 use App\Http\Controllers\Api\V1\ApiResponse;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-
-class {{ class }} extends FormRequest
+class BranchUpdateRequest extends FormRequest
 {
     public function authorize()
     {
@@ -18,7 +17,8 @@ class {{ class }} extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'required',
+            'is_main' => 'required|boolean',
         ];
     }
 

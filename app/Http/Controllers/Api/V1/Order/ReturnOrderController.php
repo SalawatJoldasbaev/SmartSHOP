@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1\Order;
 
-use App\Models\Forex;
-use App\Models\Order;
-use App\Models\Basket;
-use App\Models\Cashier;
-use App\Models\Product;
-use App\Models\Warehouse;
+use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReturnOrderRequest;
-use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Models\Basket;
+use App\Models\Cashier;
+use App\Models\Forex;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\Warehouse;
 
 class ReturnOrderController extends Controller
 {
@@ -140,9 +140,7 @@ class ReturnOrderController extends Controller
             $user->update([
                 'balance' => $debt_user,
             ]);
-
         }
-
         return ApiResponse::success();
     }
 }

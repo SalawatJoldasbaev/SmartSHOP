@@ -1,31 +1,32 @@
 <?php
 
 use App\Http\Controllers\Api\Excel\ProductExcelController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\Image\ImageController;
 use App\Http\Controllers\Api\Ingredient\IngredientController;
 use App\Http\Controllers\Api\Ingredient\IngredientProductController;
 use App\Http\Controllers\Api\Ingredient\IngredientWarehouseController;
 use App\Http\Controllers\Api\Ingredient\ProductionController;
-use App\Http\Controllers\Api\V1\CategoryController;
-use App\Http\Controllers\Api\QrCode\QrCodeController;
-use App\Http\Controllers\Api\V1\ConsumptionController;
-use App\Http\Controllers\Api\V1\Order\OrderController;
 use App\Http\Controllers\Api\Pincode\PincodeController;
-use App\Http\Controllers\Api\V1\Order\BasketController;
-use App\Http\Controllers\Api\V1\Price\CashierController;
-use App\Http\Controllers\Api\V1\Price\PaymentController;
-use App\Http\Controllers\Api\V1\Price\CurrencyController;
-use App\Http\Controllers\Api\V1\Employee\SalaryController;
-use App\Http\Controllers\Api\V1\Order\StatisticaController;
+use App\Http\Controllers\Api\QrCode\QrCodeController;
+use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\ConsumptionController;
 use App\Http\Controllers\Api\V1\Employee\EmployeeController;
+use App\Http\Controllers\Api\V1\Employee\SalaryController;
+use App\Http\Controllers\Api\V1\Order\BasketController;
+use App\Http\Controllers\Api\V1\Order\OrderController;
 use App\Http\Controllers\Api\V1\Order\ReturnOrderController;
+use App\Http\Controllers\Api\V1\Order\StatisticaController;
+use App\Http\Controllers\Api\V1\Price\CashierController;
+use App\Http\Controllers\Api\V1\Price\CurrencyController;
+use App\Http\Controllers\Api\V1\Price\PaymentController;
+use App\Http\Controllers\Api\V1\ProductController;
+use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\Warehouse\ReturnProductController;
 use App\Http\Controllers\Api\V1\Warehouse\WarehouseController;
 use App\Http\Controllers\Api\V1\Warehouse\WarehouseDefectController;
+use App\Http\Controllers\Api\V1\Warehouse\WarehouseToBranchController;
+use App\Http\Controllers\BranchController;
+use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [EmployeeController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
@@ -53,28 +54,33 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
     Route::prefix('/ingredients')
-    ->controller(IngredientController::class)
-    ->group(function () {
-        Route::get('/', 'index');
-        Route::post('/', 'create');
-        Route::put('/{ingredient}', 'update');
-        Route::delete('/{ingredient}', 'delete');
-    });
+        ->controller(IngredientController::class)
+        ->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'create');
+            Route::put('/{ingredient}', 'update');
+            Route::delete('/{ingredient}', 'delete');
+        });
 
     Route::prefix('/ingredient/product')
-    ->controller(IngredientProductController::class)
-    ->group(function () {
-        Route::get('/{product}', 'index');
-        Route::post('/', 'create');
-        Route::delete('/position/{position}', 'delete');
-    });
+        ->controller(IngredientProductController::class)
+        ->group(function () {
+            Route::get('/{product}', 'index');
+            Route::post('/', 'create');
+            Route::delete('/position/{position}', 'delete');
+        });
 
     Route::prefix('/ingredients/warehouses')
-    ->controller(IngredientWarehouseController::class)
-    ->group(function () {
+        ->controller(IngredientWarehouseController::class)
+        ->group(function () {
+            Route::post('/', 'create');
+            Route::get('/', 'index');
+            Route::get('/histories', 'histories');
+        });
+    Route::prefix('/branches')->controller(BranchController::class)->group(function () {
+        Route::get('/', 'show');
         Route::post('/', 'create');
-        Route::get('/', 'index');
-        Route::get('/histories', 'histories');
+        Route::patch('/{branch}', 'update');
     });
     Route::post('/production', [ProductionController::class, 'Production']);
     Route::post('/production/calculator', [ProductionController::class, 'calculator']);
@@ -86,6 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/currency', [CurrencyController::class, 'index']);
     Route::post('/currency', [CurrencyController::class, 'setCurrency']);
+    Route::post('/warehouse/toBranch', [WarehouseToBranchController::class, 'toBranch']);
     Route::post('/warehouse', [WarehouseController::class, 'create']);
     Route::get('/warehouse', [WarehouseController::class, 'index']);
     Route::get('/warehouse/cost-price', [WarehouseController::class, 'costprice']);

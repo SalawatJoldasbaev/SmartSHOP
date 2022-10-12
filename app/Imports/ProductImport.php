@@ -3,7 +3,6 @@
 namespace App\Imports;
 
 use App\Models\Category;
-use App\Models\Code;
 use App\Models\Currency;
 use App\Models\Product;
 use App\Models\Warehouse;
@@ -73,11 +72,10 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
                     'price' => $data['wholesale_price'],
                     'currency_id' => $wholesale->id,
                 ],
-                'uuid'=> $data['uuid'],
-                'image'=> $data['image']
+                'uuid' => $data['uuid'],
+                'image' => $data['image'],
             ]);
             if (isset($data['warehouse_count'])) {
-                $code = Code::newCode();
                 $basket = WarehouseBasket::create([
                     'employee_id' => 1,
                     'date' => Carbon::today()->format('Y-m-d'),
@@ -87,22 +85,8 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
                     'product_id' => $product->id,
                     'unit_id' => 1,
                     'count' => $data['warehouse_count'],
-                    'code' => $code,
                 ]);
-                $createCode = Code::create([
-                    'warehouse_basket_id' => $basket->id,
-                    'warehouse_order_id' => $warehouseOrder->id,
-                    'product_id' => $product->id,
-                    'code' => $code,
-                    'cost_price' => [
-                        'price' => $data['cost_price'],
-                        'currency_id' => $cost->id,
-                    ],
-                ]);
-                $warhouse = Warehouse::setWarehouse($product->id, $code, $data['warehouse_count'], 1);
-                $createCode->update([
-                    'warehouse_id' => $warhouse->id,
-                ]);
+                $warhouse = Warehouse::setWarehouse($product->id, $data['warehouse_count'], 1);
             }
             return $product;
         }

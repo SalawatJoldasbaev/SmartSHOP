@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Code;
 use App\Models\Currency;
 use App\Models\Product;
 use App\Models\Unit;
@@ -21,7 +20,7 @@ class ProductController extends Controller
     {
         try {
             $this->authorize('create', Product::class);
-        } catch (\Throwable $th) {
+        } catch (\Throwable$th) {
             return ApiResponse::error('This action is unauthorized.', 403);
         }
 
@@ -56,7 +55,6 @@ class ProductController extends Controller
         ]);
 
         if (isset($request->warehouse)) {
-            $code = Code::newCode();
             $basket = WarehouseBasket::create([
                 'employee_id' => $request->user()->id,
                 'date' => Carbon::today()->format('Y-m-d'),
@@ -66,21 +64,10 @@ class ProductController extends Controller
                 'product_id' => $product->id,
                 'unit_id' => $request->warehouse['unit_id'],
                 'count' => $request->warehouse['count'],
-                'code' => $code,
             ]);
-            $createCode = Code::create([
-                'warehouse_basket_id' => $basket->id,
-                'warehouse_order_id' => $warehouseOrder->id,
-                'product_id' => $product->id,
-                'code' => $code,
-                'cost_price' => $request->cost_price,
-            ]);
-            $warhouse = Warehouse::setWarehouse($product->id, $code, $request->warehouse['count'], $request->warehouse['unit_id']);
-            $createCode->update([
-                'warehouse_id' => $warhouse->id,
-            ]);
+            $warhouse = Warehouse::setWarehouse($product->id, $request->warehouse['count'], $request->warehouse['unit_id']);
         }
-        return ApiResponse::success(data: $product);
+        return ApiResponse::success(data:$product);
     }
 
     public function index(Request $request)
@@ -119,9 +106,9 @@ class ProductController extends Controller
         $units = Unit::all();
         foreach ($products as $product) {
             $cost_price = $currency->where('id', $product->cost_price['currency_id'])->first();
-            $min_price =  $currency->where('id', $product->min_price['currency_id'])->first();
-            $max_price =  $currency->where('id', $product->max_price['currency_id'])->first();
-            $whole_price =  $currency->where('id', $product->whole_price['currency_id'])->first();
+            $min_price = $currency->where('id', $product->min_price['currency_id'])->first();
+            $max_price = $currency->where('id', $product->max_price['currency_id'])->first();
+            $whole_price = $currency->where('id', $product->whole_price['currency_id'])->first();
             $id = $product->id;
             $unit = $units->where('id', $product->warehouse?->unit_id)->first();
             if ($delete) {
@@ -173,7 +160,7 @@ class ProductController extends Controller
                     ],
                     'count' => $product->warehouse?->count,
                 ],
-                'qr_code_link' =>  route('qrcode', [
+                'qr_code_link' => route('qrcode', [
                     'uuid' => $product->uuid,
                     'type' => 'product',
                 ]),
@@ -181,14 +168,14 @@ class ProductController extends Controller
             ];
             $final['data'][] = $temp;
         }
-        return ApiResponse::success(data: $final);
+        return ApiResponse::success(data:$final);
     }
 
     public function update(Request $request)
     {
         try {
             $this->authorize('update', Product::class);
-        } catch (\Throwable $th) {
+        } catch (\Throwable$th) {
             return ApiResponse::error('This action is unauthorized.', 403);
         }
 
@@ -211,7 +198,7 @@ class ProductController extends Controller
 
         try {
             $product = Product::findOrFail($request->product_id);
-        } catch (\Throwable $th) {
+        } catch (\Throwable$th) {
             return ApiResponse::error('product not found', 404);
         }
         $product->update([
@@ -231,7 +218,7 @@ class ProductController extends Controller
     {
         try {
             $this->authorize('delete', Product::class);
-        } catch (\Throwable $th) {
+        } catch (\Throwable$th) {
             return ApiResponse::error('This action is unauthorized.', 403);
         }
 

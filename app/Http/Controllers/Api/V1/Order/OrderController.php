@@ -45,6 +45,7 @@ class OrderController extends Controller
             if ($warehouse->count - $order['count'] >= 0) {
                 $warehouse->count -= $order['count'];
                 $set_orders->push([
+                    'branch_id' => $employee->branch_id,
                     'basket_id' => null,
                     'user_id' => $user_id,
                     'product_id' => $order['product_id'],
@@ -95,6 +96,7 @@ class OrderController extends Controller
             return ApiResponse::error('incorrect sum', 409);
         }
         $basket = Basket::create([
+            'branch_id' => $employee->branch_id,
             'user_id' => $user_id,
             'employee_id' => $employee->id,
             'card' => $card,
@@ -112,21 +114,25 @@ class OrderController extends Controller
             return $item;
         })->toArray();
 
-        Order::upsert($set_orders, [
-            'basket_id',
-            'user_id',
-            'product_id',
-            'unit_id',
-            'count',
-            'price',
-        ]);
+        // Order::upsert($set_orders, [
+        //     'basket_id',
+        //     'user_id',
+        //     'product_id',
+        //     'unit_id',
+        //     'count',
+        //     'price',
+        // ]);
+        foreach ($set_orders as $set_order) {
+            Order::create($set_order);
+        }
         foreach ($warehouses as $warehouse) {
             $warehouse->save();
         }
         $date = Carbon::today()->format('Y-m-d');
-        $cashier = Cashier::date($date)->first();
+        $cashier = Cashier::where('branch_id', $employee->branch_id)->date($date)->first();
         if (!$cashier) {
             $cashier = Cashier::create([
+                'branch_id' => $employee->branch_id,
                 'date' => $date,
                 'balance' => [
                     'card' => $card,
@@ -153,6 +159,7 @@ class OrderController extends Controller
             ]);
         } else {
             Salary::create([
+                'branch_id' => $employee->branch_id,
                 'employee_id' => $request->user()->id,
                 'date' => $date,
                 'salary' => (($sum + $request->debt) * $flex) / 100,
