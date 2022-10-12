@@ -123,6 +123,13 @@ class EmployeeController extends Controller
         }
 
         $employee->update($data);
-        return ApiResponse::success();
+        $data = [
+            'id' => $employee->id,
+            'avatar' => $employee->avatar,
+            'role' => $employee->role,
+            'phone' => $employee->phone,
+            'name' => $employee->name,
+        ];
+        return ApiResponse::success(data:$data);
     }
 }
