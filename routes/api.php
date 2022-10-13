@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\Warehouse\ReturnProductController;
 use App\Http\Controllers\Api\V1\Warehouse\WarehouseController;
 use App\Http\Controllers\Api\V1\Warehouse\WarehouseDefectController;
+use App\Http\Controllers\Api\V1\Warehouse\WarehouseHistoriesController;
 use App\Http\Controllers\Api\V1\Warehouse\WarehouseToBranchController;
 use App\Http\Controllers\BranchController;
 use Illuminate\Support\Facades\Route;
@@ -101,6 +102,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/warehouse/low-products', [WarehouseController::class, 'less']);
     Route::post('/warehouse/defect', [WarehouseDefectController::class, 'Defect']);
     Route::get('/warehouse/defect', [WarehouseDefectController::class, 'ShowDefects']);
+    Route::get('/warehouse/history', [WarehouseHistoriesController::class, 'ShowAllHistoriesBaskets']);
+    Route::get('/warehouse/history/{basket}', [WarehouseHistoriesController::class, 'ShowAllHistoriesOrders']);
+    Route::get('/warehouse/orders', [WarehouseController::class, 'Orders']);
+    Route::get('/warehouse/take/{basket}', [WarehouseToBranchController::class, 'take']);
 
     Route::post('/order', [OrderController::class, 'create']);
     Route::get('/baskets', [BasketController::class, 'index']);

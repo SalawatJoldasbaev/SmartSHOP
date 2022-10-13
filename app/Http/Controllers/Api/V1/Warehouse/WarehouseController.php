@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WarehouseAddRequest;
 use App\Models\Warehouse;
+use App\Models\WarehouseBasket;
 use App\Src\WarehouseLogic;
 use Illuminate\Http\Request;
 
@@ -72,6 +73,36 @@ class WarehouseController extends Controller
                     $final['uzs'] += $item['product']['cost_price']['price'] * $item['count'];
                 }
             }
+        }
+        return ApiResponse::success(data:$final);
+    }
+
+    public function Orders(Request $request)
+    {
+        $baskets = WarehouseBasket::where('status', 'given')->paginate($request->per_page ?? 30);
+        $final = [
+            'per_page' => $baskets->perPage(),
+            'last_page' => $baskets->lastPage(),
+            'data' => [],
+        ];
+        foreach ($baskets as $basket) {
+            $final['data'][] = [
+                'id' => $basket->id,
+                'branch' => [
+                    'id' => $basket->branch_id,
+                    'name' => $basket->branch->name,
+                ],
+                'to_branch' => [
+                    'id' => $basket->to_branch_id,
+                    'name' => $basket->toBranch?->name,
+                ],
+                'employee' => [
+                    'id' => $basket->employee_id,
+                    'name' => $basket->employee->name,
+                ],
+                'status' => $basket->status,
+                'created_at' => $basket->created_at->format('Y-m-d H:i:s'),
+            ];
         }
         return ApiResponse::success(data:$final);
     }

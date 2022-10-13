@@ -13,6 +13,7 @@ return new class extends Migration
         Schema::create('warehouse_baskets', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Branch::class);
+            $table->foreignIdFor(Branch::class, 'to_branch_id')->nullable();
             $table->foreignIdFor(Employee::class);
             $table->date('date');
             $table->enum('status', ['given', 'taken']);

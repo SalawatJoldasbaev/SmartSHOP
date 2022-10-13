@@ -12,4 +12,14 @@ class WarehouseOrder extends Model
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
     //protected $casts = [];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
 }
