@@ -33,6 +33,8 @@ class WarehouseHistoriesController extends Controller
                     'id' => $basket->employee_id,
                     'name' => $basket->employee->name,
                 ],
+                'description' => $basket->description,
+                'type' => $basket->type,
                 'status' => $basket->status,
                 'created_at' => $basket->created_at->format('Y-m-d H:i:s'),
             ];

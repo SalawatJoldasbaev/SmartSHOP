@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -18,7 +17,7 @@ class Product extends Model
         'max_price' => 'array',
         'min_price' => 'array',
         'cost_price' => 'array',
-        'deleted_at' => 'datetime:Y-m-d H:i:s'
+        'deleted_at' => 'datetime:Y-m-d H:i:s',
     ];
     public function category()
     {

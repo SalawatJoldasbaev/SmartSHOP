@@ -23,7 +23,6 @@ use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\Warehouse\ReturnProductController;
 use App\Http\Controllers\Api\V1\Warehouse\WarehouseController;
-use App\Http\Controllers\Api\V1\Warehouse\WarehouseDefectController;
 use App\Http\Controllers\Api\V1\Warehouse\WarehouseHistoriesController;
 use App\Http\Controllers\Api\V1\Warehouse\WarehouseToBranchController;
 use App\Http\Controllers\BranchController;
@@ -78,18 +77,24 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', 'index');
             Route::get('/histories', 'histories');
         });
-    Route::prefix('/branches')->controller(BranchController::class)->group(function () {
-        Route::get('/', 'show');
-        Route::post('/', 'create');
-        Route::patch('/{branch}', 'update');
-    });
-    Route::post('/production', [ProductionController::class, 'Production']);
-    Route::post('/production/calculator', [ProductionController::class, 'calculator']);
-    Route::post('/production/create', [ProductionController::class, 'createBasket']);
-    Route::get('/production/baskets', [ProductionController::class, 'baskets']);
-    Route::get('/production/histories', [ProductionController::class, 'histories']);
-    Route::get('/production/orders/{basket}', [ProductionController::class, 'orders']);
-    Route::post('/production/finshed/{basket}', [ProductionController::class, 'finshed']);
+    Route::prefix('/branches')
+        ->controller(BranchController::class)
+        ->group(function () {
+            Route::get('/', 'show');
+            Route::post('/', 'create');
+            Route::patch('/{branch}', 'update');
+        });
+    Route::prefix('/production')
+        ->controller(ProductionController::class)
+        ->group(function () {
+            Route::post('/', 'Production');
+            Route::post('/calculator', 'calculator');
+            Route::post('/create', 'create');
+            Route::get('/baskets', 'baskets');
+            Route::get('/histories', 'histories');
+            Route::get('/orders/{basket}', 'orders');
+            Route::get('/finshed/{basket}', 'finshed');
+        });
 
     Route::get('/currency', [CurrencyController::class, 'index']);
     Route::post('/currency', [CurrencyController::class, 'setCurrency']);
@@ -98,14 +103,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/warehouse', [WarehouseController::class, 'index']);
     Route::get('/warehouse/cost-price', [WarehouseController::class, 'costprice']);
     Route::post('/warehouse/return', [ReturnProductController::class, 'returnProduct']);
-    Route::get('/warehouse/return/history', [ReturnProductController::class, 'show']);
     Route::get('/warehouse/low-products', [WarehouseController::class, 'less']);
-    Route::post('/warehouse/defect', [WarehouseDefectController::class, 'Defect']);
-    Route::get('/warehouse/defect', [WarehouseDefectController::class, 'ShowDefects']);
     Route::get('/warehouse/history', [WarehouseHistoriesController::class, 'ShowAllHistoriesBaskets']);
     Route::get('/warehouse/history/{basket}', [WarehouseHistoriesController::class, 'ShowAllHistoriesOrders']);
     Route::get('/warehouse/orders', [WarehouseController::class, 'Orders']);
-    Route::get('/warehouse/take/{basket}', [WarehouseToBranchController::class, 'take']);
+    Route::get('/warehouse/take/{basket}', [WarehouseController::class, 'take']);
 
     Route::post('/order', [OrderController::class, 'create']);
     Route::get('/baskets', [BasketController::class, 'index']);

@@ -20,6 +20,7 @@ class WarehouseLogic
             'employee_id' => $data->user()?->id ?? Auth::user()->id,
             'date' => $date,
             'status' => 'taken',
+            'type' => 'factory to main warehouse',
         ]);
         $data = $data->all();
         foreach ($data as $product) {

@@ -76,6 +76,7 @@ class ProductController extends Controller
         $category_id = $request->category_id;
         $search = $request->search;
         $count = $request->count;
+        $branch_id = $request->branch_id ?? $request->user()->branch_id;
         $products = Product::when($category_id, function ($query) use ($category_id) {
             $query->where('category_id', $category_id);
         })->when($search, function ($query) use ($search) {
@@ -104,13 +105,15 @@ class ProductController extends Controller
         $temp = [];
         $currency = Currency::all();
         $units = Unit::all();
+        $warhouses = Warehouse::where('active', true)->where('branch_id', $branch_id)->get();
         foreach ($products as $product) {
             $cost_price = $currency->where('id', $product->cost_price['currency_id'])->first();
             $min_price = $currency->where('id', $product->min_price['currency_id'])->first();
             $max_price = $currency->where('id', $product->max_price['currency_id'])->first();
             $whole_price = $currency->where('id', $product->whole_price['currency_id'])->first();
             $id = $product->id;
-            $unit = $units->where('id', $product->warehouse?->unit_id)->first();
+            $warhouse = $warhouses->where('product_id', $id)->first();
+            $unit = $units->where('id', $warhouse?->unit_id)->first();
             if ($delete) {
                 $category = $product->category()->withTrashed()->first();
             } else {
@@ -158,7 +161,7 @@ class ProductController extends Controller
                         'name' => $unit?->name,
                         'code' => $unit?->unit,
                     ],
-                    'count' => $product->warehouse?->count,
+                    'count' => $warhouse?->count ?? 0,
                 ],
                 'qr_code_link' => route('qrcode', [
                     'uuid' => $product->uuid,

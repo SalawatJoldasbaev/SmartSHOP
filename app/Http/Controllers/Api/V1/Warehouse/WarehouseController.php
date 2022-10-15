@@ -35,6 +35,7 @@ class WarehouseController extends Controller
         if (!$branch_id) {
             $branch_id = $employee->branch_id;
         }
+
         $warehouse = $this->warehouseLogic->getWarehouse(
             search:$request->search ?? null,
             category_id:$request->category_id,
@@ -60,7 +61,12 @@ class WarehouseController extends Controller
 
     public function costprice(Request $request)
     {
-        $warehouse = Warehouse::active()->with('product')->get();
+        $branch_id = $request->branch_id;
+        $warehouse = Warehouse::active()
+            ->when($branch_id, function ($query, $branch_id) {
+                return $query->where('branch_id', $branch_id);
+            })
+            ->with('product')->get();
         $final = [
             'usd' => 0,
             'uzs' => 0,
@@ -79,7 +85,14 @@ class WarehouseController extends Controller
 
     public function Orders(Request $request)
     {
-        $baskets = WarehouseBasket::where('status', 'given')->paginate($request->per_page ?? 30);
+        $employee = $request->user();
+
+        $baskets = WarehouseBasket::where('status', 'given')
+            ->where(function ($query) use ($employee) {
+                return $query->where('branch_id', $employee->branch_id)
+                    ->orWhere('to_branch_id', $employee->branch_id);
+            })
+            ->paginate($request->per_page ?? 30);
         $final = [
             'per_page' => $baskets->perPage(),
             'last_page' => $baskets->lastPage(),
@@ -100,10 +113,22 @@ class WarehouseController extends Controller
                     'id' => $basket->employee_id,
                     'name' => $basket->employee->name,
                 ],
+                'type' => $basket->type,
                 'status' => $basket->status,
                 'created_at' => $basket->created_at->format('Y-m-d H:i:s'),
             ];
         }
         return ApiResponse::success(data:$final);
+    }
+
+    public function take(Request $request, WarehouseBasket $basket)
+    {
+        if ($basket->type == 'branch to branch') {
+            $data = new WarehouseToBranchController();
+            return $data->take($request, $basket);
+        } elseif ($basket->type == 'defect' or $basket->type == 'gift') {
+            $data = new WarehouseDefectController();
+            return $data->take($request, $basket);
+        }
     }
 }

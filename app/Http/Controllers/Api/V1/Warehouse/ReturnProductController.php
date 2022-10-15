@@ -2,87 +2,57 @@
 
 namespace App\Http\Controllers\Api\V1\Warehouse;
 
-use Carbon\Carbon;
-use App\Models\Warehouse;
-use Illuminate\Http\Request;
-use App\Models\WarehouseHistory;
+use App\Http\Controllers\Api\V1\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DefectRequest;
-use App\Models\WarehouseHistoryItem;
-use App\Models\WarehouseHistoryBasket;
-use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Models\Branch;
+use App\Models\Warehouse;
+use App\Models\WarehouseBasket;
+use App\Models\WarehouseOrder;
+use Carbon\Carbon;
 
 class ReturnProductController extends Controller
 {
     public function returnProduct(DefectRequest $request)
     {
-        $defetives = $request->all();
-        foreach ($defetives as $item) {
-            $warehouse = Warehouse::where('product_id', $item['product_id'])->active()->first();
-            if ($warehouse->count - $item['count'] < 0) {
+        $employee = $request->user();
+        $branch = Branch::find($request->branch_id);
+        if ($request->type == 'return' and ($employee->branch->is_main == false or $branch->is_main == false)) {
+            return ApiResponse::error('not allowed', 400);
+        }
+        $data = $request->data;
+        foreach ($data as $item) {
+            $warehouse = Warehouse::where('product_id', $item['product_id'])
+                ->active()->where('branch_id', $branch->id)
+                ->first();
+            if (($warehouse?->count ?? 0) - $item['count'] < 0) {
                 return ApiResponse::error('not enough product', 422);
             }
         }
-
-        $basket = WarehouseHistoryBasket::create([
-            'employee_id' => $request->user()->id,
+        $basket = WarehouseBasket::create([
+            'branch_id' => $request->branch_id,
+            'to_branch_id' => $request->to_branch_id,
+            'employee_id' => $employee->id,
             'date' => Carbon::today(),
             'description' => $request->description,
-            'additional' => []
+            'type' => $request->type,
+            'status' => $request->type == 'return' ? 'taken' : 'given',
         ]);
-
-        foreach ($defetives as $item) {
-            $warehouse = Warehouse::where('product_id', $item['product_id'])->active()->first();
+        foreach ($data as $item) {
+            $warehouse = Warehouse::where('product_id', $item['product_id'])
+                ->where('branch_id', $request->branch_id)
+                ->active()
+                ->first();
             $warehouse->count -= $item['count'];
             $warehouse->save();
-            WarehouseHistoryItem::create([
-                'warehouse_history_basket_id' => $basket->id,
+            WarehouseOrder::create([
+                'branch_id' => $request->branch_id,
+                'warehouse_basket_id' => $basket->id,
                 'product_id' => $item['product_id'],
-                'count' => $item['count']
+                'unit_id' => $warehouse->unit_id,
+                'count' => $item['count'],
             ]);
         }
-        WarehouseHistory::create([
-            'warehouse_history_basket_id' => $basket->id,
-            'employee_id' => $request->user()->id,
-            'description' => $request->description,
-            'type' => 'return'
-        ]);
         return ApiResponse::success();
-    }
-
-
-    public function show(Request $request)
-    {
-        $from = $request->from ?? Carbon::today();
-        $to = $request->to ?? Carbon::today();
-
-        $histories = WarehouseHistory::where('type', 'return')->whereDate('created_at', '>=', $from)
-            ->whereDate('created_at', '<=', $to)
-            ->get();
-        $final = [];
-        foreach ($histories as $history) {
-            $temp = [
-                'id' => $history->id,
-                'basket_id' => $history->warehouse_history_basket_id,
-                'description' => $history->description,
-                'employee' => [
-                    'id' => $history->employee_id,
-                    'name' => $history->employee->name,
-                    'role' => $history->employee->role
-                ],
-                'items' => []
-            ];
-
-            foreach ($history->items as $item) {
-                $temp['items'][] = [
-                    'item_id' => $item->id,
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product->name,
-                    'count' => $item->count
-                ];
-            }
-            $final[] = $temp;
-        }
-        return ApiResponse::success(data: $final);
     }
 }

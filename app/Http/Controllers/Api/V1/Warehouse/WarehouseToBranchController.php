@@ -33,6 +33,7 @@ class WarehouseToBranchController extends Controller
             'employee_id' => $employee->id,
             'date' => $date,
             'status' => 'given',
+            'type' => 'branch to branch',
         ]);
         foreach ($request->products as $product) {
             $warehouse = $warehouses->where('product_id', $product['product_id'])?->first();
