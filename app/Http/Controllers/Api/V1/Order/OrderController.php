@@ -25,7 +25,7 @@ class OrderController extends Controller
         $user_id = $request->client_id ?? 1;
         $employee = $request->user();
         $orders = $request->orders;
-        $warehouses = Warehouse::active()->get();
+        $warehouses = Warehouse::active()->where('branch_id', $employee->branch_id)->get();
         $set_orders = collect([]);
         $price = 0;
         $card = $request->card;
@@ -114,14 +114,6 @@ class OrderController extends Controller
             return $item;
         })->toArray();
 
-        // Order::upsert($set_orders, [
-        //     'basket_id',
-        //     'user_id',
-        //     'product_id',
-        //     'unit_id',
-        //     'count',
-        //     'price',
-        // ]);
         foreach ($set_orders as $set_order) {
             Order::create($set_order);
         }
