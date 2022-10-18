@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,6 +14,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        Company::create([
+            'name' => 'Company',
+            'phone' => '+998999999999',
+            'address' => 'address',
+        ]);
         $this->call([
             CategorySeeder::class,
             UserSeeder::class,

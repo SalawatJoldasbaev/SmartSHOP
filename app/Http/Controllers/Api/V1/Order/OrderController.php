@@ -53,7 +53,7 @@ class OrderController extends Controller
                     'price' => $order['price'],
                 ]);
             } else {
-                return ApiResponse::error('product is not enough', data:[
+                return ApiResponse::error('product is not enough', data: [
                     'id' => $order['product_id'],
                     'name' => $warehouse->product->name,
                 ]);
@@ -200,6 +200,6 @@ class OrderController extends Controller
                 'price' => $order->price,
             ];
         }
-        return ApiResponse::success(data:$final);
+        return ApiResponse::success(data: $final);
     }
 }
