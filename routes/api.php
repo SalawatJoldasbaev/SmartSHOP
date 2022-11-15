@@ -96,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/finshed/{basket}', 'finshed');
         });
 
+
     Route::get('/currency', [CurrencyController::class, 'index']);
     Route::post('/currency', [CurrencyController::class, 'setCurrency']);
     Route::post('/warehouse/toBranch', [WarehouseToBranchController::class, 'toBranch']);
@@ -112,6 +113,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/order', [OrderController::class, 'create']);
     Route::get('/baskets', [BasketController::class, 'index']);
     Route::get('/orders', [BasketController::class, 'basketOrders']);
+    Route::get('/profit', [CashierController::class, 'ProfitShow']);
     Route::get('/cashier', [CashierController::class, 'cashier']);
     Route::get('/cashier/monthly', [CashierController::class, 'monthly']);
     Route::get('/consumption/categories', [ConsumptionController::class, 'Categories']);

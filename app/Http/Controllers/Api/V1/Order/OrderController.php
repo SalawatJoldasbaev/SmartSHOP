@@ -11,6 +11,7 @@ use App\Models\Cashier;
 use App\Models\Forex;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Profit;
 use App\Models\Salary;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -21,79 +22,23 @@ class OrderController extends Controller
 {
     public function create(OrderRequest $request)
     {
-        $cost_price = 0;
-        $user_id = $request->client_id ?? 1;
         $employee = $request->user();
-        $orders = $request->orders;
-        $warehouses = Warehouse::active()->where('branch_id', $employee->branch_id)->get();
-        $set_orders = collect([]);
-        $price = 0;
+        $user_id = $request->client_id ?? 1;
         $card = $request->card;
         $cash = $request->cash;
-
         $sum = $card + $cash;
-        $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
-        foreach ($orders as $order) {
-            $product = Product::find($order['product_id']);
-            $price += $order['count'] * $order['price'];
+        $price = 0;
+        $prices = [];
+        $user = User::find($user_id);
+        $warehouses = Warehouse::active()->where('branch_id', $employee->branch_id)->get();
+        foreach ($request->orders as $order) {
             $warehouse = $warehouses->where('product_id', $order['product_id'])->first();
-            if ($product->cost_price['currency_id'] == 2) {
-                $cost_price += (($product->cost_price['price'] * $usdToUzs->rate) * $order['count']);
-            } else {
-                $cost_price += ($product->cost_price['price'] * $order['count']);
-            }
-            if ($warehouse->count - $order['count'] >= 0) {
-                $warehouse->count -= $order['count'];
-                $set_orders->push([
-                    'branch_id' => $employee->branch_id,
-                    'basket_id' => null,
-                    'user_id' => $user_id,
-                    'product_id' => $order['product_id'],
-                    'unit_id' => $order['unit_id'],
-                    'count' => $order['count'],
-                    'price' => $order['price'],
-                ]);
-            } else {
-                return ApiResponse::error('product is not enough', data:[
+            if ($warehouse->count - $order['count'] < 0) {
+                return ApiResponse::error('product is not enough', data: [
                     'id' => $order['product_id'],
                     'name' => $warehouse->product->name,
                 ]);
             }
-        }
-        $user = User::find($user_id);
-        if ($request->debt > 0) {
-            $user->balance -= $request->debt;
-            $user->save();
-        } elseif ($sum - $price <= 500) {
-            $remaining_sum = [
-                'cash' => 0,
-                'card' => 0,
-            ];
-            $copy_price = $price;
-            $basket = Basket::where('user_id', $user->id)->where('debt->remaining', '>', 0)->first();
-            if ($basket) {
-                $copy_price -= $card;
-                if ($copy_price < 0) {
-                    $card += $copy_price;
-                    $remaining_sum['card'] = abs($copy_price);
-                }
-                $copy_price -= $cash;
-                if ($copy_price < 0) {
-                    $cash += $copy_price;
-                    $remaining_sum['cash'] = abs($copy_price);
-                }
-                $payment = new PaymentController();
-                $payment->paidDebt(new Request([
-                    'employee_id' => $request->user()->id,
-                    'basket_id' => $basket->id,
-                    'cash' => $remaining_sum['cash'],
-                    'card' => $remaining_sum['card'],
-                ]));
-            }
-            $user->balance += $sum - $price;
-            $user->save();
-        } elseif ($sum - $price > 500) {
-            return ApiResponse::error('incorrect sum', 409);
         }
         $basket = Basket::create([
             'branch_id' => $employee->branch_id,
@@ -109,16 +54,77 @@ class OrderController extends Controller
             'term' => $request->term,
             'description' => $request->description,
         ]);
-        $set_orders = $set_orders->map(function ($item, $key) use ($basket) {
-            $item['basket_id'] = $basket->id;
-            return $item;
-        })->toArray();
 
-        foreach ($set_orders as $set_order) {
-            Order::create($set_order);
-        }
-        foreach ($warehouses as $warehouse) {
+        foreach ($request->orders as $order) {
+            $warehouse = $warehouses->where('product_id', $order['product_id'])->first();
+            $warehouse->count -= $order['count'];
             $warehouse->save();
+            Order::create([
+                'branch_id' => $employee->branch_id,
+                'basket_id' => $basket->id,
+                'user_id' => $user_id,
+                'product_id' => $order['product_id'],
+                'unit_id' => $order['unit_id'],
+                'count' => $order['count'],
+                'price' => $order['price'],
+            ]);
+            $product = Product::find($order['product_id']);
+            $price += $order['count'] * $order['price'];
+
+            if ($product->cost_price['currency_id'] == 2) {
+                $cost_price = $this->UsdToUzs($product->cost_price['price'], $order['count']);
+            } else {
+                $cost_price = ($product->cost_price['price'] * $order['count']);
+            }
+
+            if (key_exists($product->category_id, $prices)) {
+                $prices[$product->category_id] = [
+                    'category_id' => $product->category_id,
+                    'price' =>  $prices[$product->category_id]['price'] + $order['count'] * $order['price'],
+                    'profit' => $prices[$product->category_id]['profit'] + (($order['count'] * $order['price']) - $cost_price),
+                ];
+            } else {
+                $prices[$product->category_id] = [
+                    'category_id' => $product->category_id,
+                    'price' =>  $order['count'] * $order['price'],
+                    'profit' => (($order['count'] * $order['price']) - $cost_price),
+                ];
+            }
+            $cost_price = 0;
+        }
+        if ($request->debt > 0) {
+            $user->balance -= $request->debt;
+            $user->save();
+        } elseif ($sum - $price <= 500) {
+            $remaining_sum = [
+                'cash' => 0,
+                'card' => 0,
+            ];
+            $copy_price = $price;
+            $tempBasket = Basket::where('user_id', $user->id)->where('debt->remaining', '>', 0)->first();
+            if ($tempBasket) {
+                $copy_price -= $card;
+                if ($copy_price < 0) {
+                    $card += $copy_price;
+                    $remaining_sum['card'] = abs($copy_price);
+                }
+                $copy_price -= $cash;
+                if ($copy_price < 0) {
+                    $cash += $copy_price;
+                    $remaining_sum['cash'] = abs($copy_price);
+                }
+                $payment = new PaymentController();
+                $payment->paidDebt(new Request([
+                    'employee_id' => $request->user()->id,
+                    'basket_id' => $tempBasket->id,
+                    'cash' => $remaining_sum['cash'],
+                    'card' => $remaining_sum['card'],
+                ]));
+            }
+            $user->balance += $sum - $price;
+            $user->save();
+        } elseif ($sum - $price > 500) {
+            return ApiResponse::error('incorrect sum', 409);
         }
         $date = Carbon::today()->format('Y-m-d');
         $cashier = Cashier::where('branch_id', $employee->branch_id)->date($date)->first();
@@ -130,8 +136,7 @@ class OrderController extends Controller
                     'card' => $card,
                     'cash' => $cash,
                     'sum' => $sum,
-                ],
-                'profit' => $sum - $cost_price,
+                ]
             ]);
         } else {
             $cashier->update([
@@ -140,11 +145,11 @@ class OrderController extends Controller
                     'cash' => $cashier->balance['cash'] + $cash,
                     'sum' => $cashier->balance['sum'] + $sum,
                 ],
-                'profit' => $cashier->profit + ($sum - $cost_price),
             ]);
         }
-        $salary = Salary::where('date', $date)->where('employee_id', $request->user()->id)->first();
-        $flex = $request->user()->flex;
+
+        $salary = Salary::where('date', $date)->where('employee_id', $employee->id)->first();
+        $flex = $employee->flex;
         if ($salary) {
             $salary->update([
                 'salary' => $salary->salary + ((($sum + $request->debt) * $flex) / 100),
@@ -152,12 +157,11 @@ class OrderController extends Controller
         } else {
             Salary::create([
                 'branch_id' => $employee->branch_id,
-                'employee_id' => $request->user()->id,
+                'employee_id' => $employee->id,
                 'date' => $date,
                 'salary' => (($sum + $request->debt) * $flex) / 100,
             ]);
         }
-
         $final = [
             'id' => $basket->id,
             'amount' => [
@@ -183,8 +187,8 @@ class OrderController extends Controller
             'orders' => [],
             'created_at' => date_format($basket->created_at, 'Y-m-d H:i:s'),
             'qr_link' => route('qrcode', [
+                'uuid' => "$basket->uuid",
                 'type' => 'basket',
-                'uuid' => $basket->uuid,
             ]),
         ];
         $orders = $basket->orders;
@@ -199,6 +203,29 @@ class OrderController extends Controller
                 'price' => $order->price,
             ];
         }
-        return ApiResponse::success(data:$final);
+        foreach ($prices as $item) {
+            $profit = Profit::where('date', $date)->where('category_id', $item['category_id'])->first();
+            if ($profit) {
+                $profit->update([
+                    'profit' => $profit->profit + $item['profit'],
+                    'sum' => $profit->sum + $item['price'],
+                ]);
+            } else {
+                Profit::create([
+                    'date' => $date,
+                    'branch_id' => $employee->branch_id,
+                    'category_id' => $item['category_id'],
+                    'profit' => $item['profit'],
+                    'sum' => $item['price'],
+                ]);
+            }
+        }
+        return ApiResponse::success(data: $final);
+    }
+
+    public function UsdToUzs($usd, $count = 1)
+    {
+        $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
+        return (($usd * $usdToUzs->rate) * $count);
     }
 }
