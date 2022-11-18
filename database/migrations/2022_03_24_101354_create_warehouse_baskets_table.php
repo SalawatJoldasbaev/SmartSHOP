@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignIdFor(Branch::class, 'to_branch_id')->nullable();
             $table->foreignIdFor(Employee::class);
             $table->date('date');
-            $table->enum('type', ['defect', 'return', 'gift', 'branch to branch', ' factory to main warehouse']);
+            $table->enum('type', ['defect', 'return', 'gift', 'branch to branch', 'factory to main warehouse']);
             $table->enum('status', ['given', 'taken']);
             $table->text('description')->nullable();
             $table->timestamps();

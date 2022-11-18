@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('pincode')->unique();
             $table->double('salary')->nullable();
             $table->double('flex')->nullable();
+            $table->boolean('active')->default(true);
             $table->enum('role', ['saller', 'admin', 'ceo', 'warehouseManager']);
             $table->timestamps();
             $table->softDeletes();

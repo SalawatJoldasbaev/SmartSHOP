@@ -120,6 +120,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/consumption', [ConsumptionController::class, 'create']);
     Route::get('/consumptions', [ConsumptionController::class, 'index']);
     Route::get('/employees', [EmployeeController::class, 'index']);
+    Route::post('/employees/{employee}/ChangeStatus', [EmployeeController::class, 'active']);
     Route::patch('/employee/update', [EmployeeController::class, 'update']);
     Route::post('/salary', [SalaryController::class, 'setSalary']);
     Route::get('/salary/employee', [SalaryController::class, 'show']);

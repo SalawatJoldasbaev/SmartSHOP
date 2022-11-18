@@ -37,11 +37,11 @@ class WarehouseController extends Controller
         }
 
         $warehouse = $this->warehouseLogic->getWarehouse(
-            search:$request->search ?? null,
-            category_id:$request->category_id,
-            branch_id:$branch_id
+            search: $request->search ?? null,
+            category_id: $request->category_id,
+            branch_id: $branch_id
         );
-        return ApiResponse::success(data:$warehouse);
+        return ApiResponse::success(data: $warehouse);
     }
     public function less(Request $request)
     {
@@ -51,12 +51,12 @@ class WarehouseController extends Controller
             $branch_id = $employee->branch_id;
         }
         $warehouse = $this->warehouseLogic->getWarehouse(
-            search:$request->search ?? null,
-            min_product:true,
-            category_id:$request->category_id,
-            branch_id:$branch_id
+            search: $request->search ?? null,
+            min_product: true,
+            category_id: $request->category_id,
+            branch_id: $branch_id
         );
-        return ApiResponse::success(data:$warehouse);
+        return ApiResponse::success(data: $warehouse);
     }
 
     public function costprice(Request $request)
@@ -80,7 +80,7 @@ class WarehouseController extends Controller
                 }
             }
         }
-        return ApiResponse::success(data:$final);
+        return ApiResponse::success(data: $final);
     }
 
     public function Orders(Request $request)
@@ -91,6 +91,13 @@ class WarehouseController extends Controller
             ->where(function ($query) use ($employee) {
                 return $query->where('branch_id', $employee->branch_id)
                     ->orWhere('to_branch_id', $employee->branch_id);
+            })
+            ->when($request->employee_id, function ($query, $employee_id) {
+                return $query->where('employee_id', $employee_id);
+            })->when($request->tome, function ($query, $tome) use ($employee) {
+                if ($tome == 1) {
+                    return $query->where('to_branch_id', $employee->branch_id);
+                }
             })
             ->paginate($request->per_page ?? 30);
         $final = [
@@ -118,7 +125,7 @@ class WarehouseController extends Controller
                 'created_at' => $basket->created_at->format('Y-m-d H:i:s'),
             ];
         }
-        return ApiResponse::success(data:$final);
+        return ApiResponse::success(data: $final);
     }
 
     public function take(Request $request, WarehouseBasket $basket)

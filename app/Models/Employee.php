@@ -15,7 +15,9 @@ class Employee extends Authenticatable
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
-    //protected $casts = [];
+    protected $casts = [
+        'active' => 'boolean',
+    ];
 
     public function branch()
     {

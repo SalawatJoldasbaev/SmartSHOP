@@ -22,7 +22,7 @@ class EmployeeController extends Controller
             return $query->where('name', 'like', "%" . $search . "%")
                 ->orWhere('phone', 'like', "%" . $search . "%");
         })
-            ->select('id', 'branch_id', 'avatar', 'name', 'phone', 'salary', 'flex', 'role')->get();
+            ->select('id', 'branch_id', 'avatar', 'name', 'phone', 'salary', 'flex', 'active', 'role')->get();
         $final = [];
         foreach ($employees as $employee) {
             $branch = $branches->where('id', $employee->branch_id)->first();
@@ -34,13 +34,13 @@ class EmployeeController extends Controller
                 ],
             ]);
         }
-        return ApiResponse::success(data:$final);
+        return ApiResponse::success(data: $final);
     }
     public function register(Request $request)
     {
         try {
             $this->authorize('create', Employee::class);
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             return ApiResponse::error('This action is unauthorized.', 403);
         }
 
@@ -57,7 +57,7 @@ class EmployeeController extends Controller
         ]);
 
         if ($validation->fails()) {
-            return ApiResponse::data(false, $validation->errors()->first(), code:422);
+            return ApiResponse::data(false, $validation->errors()->first(), code: 422);
         }
 
         Employee::create([
@@ -117,7 +117,7 @@ class EmployeeController extends Controller
     {
         try {
             $this->authorize('update', Employee::class);
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             return ApiResponse::error('This action is unauthorized.', 403);
         }
 
@@ -133,7 +133,7 @@ class EmployeeController extends Controller
         ]);
 
         if ($validation->fails()) {
-            return ApiResponse::data(false, $validation->errors()->first(), code:422);
+            return ApiResponse::data(false, $validation->errors()->first(), code: 422);
         }
         $employee = Employee::find($request->employee_id);
         $data = [
@@ -151,6 +151,13 @@ class EmployeeController extends Controller
         }
 
         $employee->update($data);
+        return ApiResponse::success();
+    }
+
+    public function active(Request $request, Employee $employee)
+    {
+        $employee->active = !$employee->active;
+        $employee->save();
         return ApiResponse::success();
     }
 }
