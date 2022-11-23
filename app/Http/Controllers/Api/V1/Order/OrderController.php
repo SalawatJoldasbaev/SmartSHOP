@@ -15,6 +15,7 @@ use App\Models\Profit;
 use App\Models\Salary;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Models\WarehouseBasket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -30,10 +31,23 @@ class OrderController extends Controller
         $price = 0;
         $prices = [];
         $user = User::find($user_id);
+
+        $warehouseBaskets = WarehouseBasket::where('status', 'given')->where('type', 'branch to branch')->where('branch_id', $employee->branch_id)->get();
+        $warehouseGivenProducts = [];
+        foreach ($warehouseBaskets as $warehouseBasket) {
+            $warehouseBasketItems = $warehouseBasket->items;
+            foreach ($warehouseBasketItems as $item) {
+                if (key_exists($item->product_id, $warehouseGivenProducts)) {
+                    $warehouseGivenProducts[$item->product_id] += $item->count;
+                } else {
+                    $warehouseGivenProducts[$item->product_id] = $item->count;
+                }
+            }
+        }
         $warehouses = Warehouse::active()->where('branch_id', $employee->branch_id)->get();
         foreach ($request->orders as $order) {
             $warehouse = $warehouses->where('product_id', $order['product_id'])->first();
-            if ($warehouse->count - $order['count'] < 0) {
+            if (($warehouse->count - $warehouseGivenProducts[$warehouse->product_id]) - $order['count'] < 0) {
                 return ApiResponse::error('product is not enough', data: [
                     'id' => $order['product_id'],
                     'name' => $warehouse->product->name,

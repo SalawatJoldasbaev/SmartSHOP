@@ -37,7 +37,6 @@ class WarehouseToBranchController extends Controller
         ]);
         foreach ($request->products as $product) {
             $warehouse = $warehouses->where('product_id', $product['product_id'])?->first();
-            $warehouse->count -= $product['count'];
             WarehouseOrder::create([
                 'branch_id' => $employee->branch_id,
                 'warehouse_basket_id' => $basket->id,
@@ -45,7 +44,6 @@ class WarehouseToBranchController extends Controller
                 'unit_id' => $warehouse->unit_id,
                 'count' => $product['count'],
             ]);
-            $warehouse->save();
         }
         return ApiResponse::success('success');
     }
@@ -62,6 +60,11 @@ class WarehouseToBranchController extends Controller
         $orders = WarehouseOrder::where('warehouse_basket_id', $basket->id)->get();
         $date = Carbon::today()->format('Y-m-d');
         foreach ($orders as $order) {
+
+            $branchWarehouse = Warehouse::where('active', true)->where('branch_id', $basket->branch_id)->where('product_id', $order->product_id)->first();
+            $branchWarehouse->count -= $order->count;
+            $branchWarehouse->save();
+
             $warehouse = Warehouse::where('active', true)->where('branch_id', $basket->to_branch_id)->where('product_id', $order->product_id)->first();
             $updated_count = ($warehouse->count ?? 0) + $order->count;
             if ($warehouse and $date == $warehouse->date) {

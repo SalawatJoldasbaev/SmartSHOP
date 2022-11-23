@@ -25,4 +25,9 @@ class WarehouseBasket extends Model
     {
         return $this->belongsTo(Branch::class, 'to_branch_id', 'id');
     }
+
+    public function items()
+    {
+        return $this->hasMany(WarehouseOrder::class);
+    }
 }

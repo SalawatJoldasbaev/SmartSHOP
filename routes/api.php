@@ -102,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/warehouse/toBranch', [WarehouseToBranchController::class, 'toBranch']);
     Route::post('/warehouse', [WarehouseController::class, 'create']);
     Route::get('/warehouse', [WarehouseController::class, 'index']);
+    Route::get('/warehouse/all-branch', [WarehouseController::class, 'ShowAllWarehouse']);
     Route::get('/warehouse/cost-price', [WarehouseController::class, 'costprice']);
     Route::post('/warehouse/return', [ReturnProductController::class, 'returnProduct']);
     Route::get('/warehouse/low-products', [WarehouseController::class, 'less']);

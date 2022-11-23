@@ -138,4 +138,32 @@ class WarehouseController extends Controller
             return $data->take($request, $basket);
         }
     }
+
+    public function ShowAllWarehouse(Request $request)
+    {
+        $warehouses = Warehouse::active()->get()->groupBy('product_id');
+        $final = [];
+        foreach ($warehouses as $key => $warehouse) {
+            $temp = [
+                'product_id' => $warehouse[0]->product_id,
+                'product_name' => $warehouse[0]->product->name,
+                'count' => $warehouse->sum('count'),
+                'unit' => [
+                    'id' => $warehouse[0]->unit->id,
+                    'name' => $warehouse[0]->unit->name,
+                    'code' => $warehouse[0]->unit->unit,
+                ],
+                'by_branch' => []
+            ];
+            foreach ($warehouse as $item) {
+                $temp['by_branch'][] = [
+                    'branch_id' => $item->branch_id,
+                    'branch_name' => $item->branch->name,
+                    'count' => $item->count,
+                ];
+            }
+            $final[] = $temp;
+        }
+        return ApiResponse::success(data: $final);
+    }
 }

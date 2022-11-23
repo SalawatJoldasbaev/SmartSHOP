@@ -12,8 +12,7 @@ class Warehouse extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
-    protected $casts = [
-    ];
+    protected $casts = [];
 
     public function scopeSetWarehouse($query, $product_id, $count, $unit_id)
     {
@@ -60,5 +59,10 @@ class Warehouse extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }
