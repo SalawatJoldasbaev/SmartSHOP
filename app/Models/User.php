@@ -26,6 +26,7 @@ class User extends Authenticatable
         'balance',
         'about',
         'password',
+        'branch_id',
     ];
 
     /**

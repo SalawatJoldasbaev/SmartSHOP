@@ -22,10 +22,12 @@ class UserController extends Controller
         ]);
 
         if ($validation->fails()) {
-            return ApiResponse::data(false, $validation->errors()->first(), code:422);
+            return ApiResponse::data(false, $validation->errors()->first(), code: 422);
         }
 
         $user = User::create([
+            'branch_id' => $request->user()->branch_id,
+
             'full_name' => $request->full_name,
             'phone' => $request->phone,
             'type' => $request->type,
@@ -34,9 +36,9 @@ class UserController extends Controller
             'about' => $request->about,
         ]);
 
-        return ApiResponse::success(data:[
+        return ApiResponse::success(data: [
             'id' => $user->id,
-        ], code:201);
+        ], code: 201);
     }
 
     public function index(Request $request)
@@ -66,7 +68,7 @@ class UserController extends Controller
             $final['data']['clients'][] = $user;
         }
 
-        return ApiResponse::success(data:$final);
+        return ApiResponse::success(data: $final);
     }
 
     public function update(UserUpdateRequest $request)
@@ -76,10 +78,10 @@ class UserController extends Controller
             $client = User::findOrFail($client_id);
             try {
                 $this->authorize('update', $client);
-            } catch (\Throwable$th) {
+            } catch (\Throwable $th) {
                 return ApiResponse::error('This action is unauthorized.', 403);
             }
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             return ApiResponse::error('client not found', 404);
         }
 
