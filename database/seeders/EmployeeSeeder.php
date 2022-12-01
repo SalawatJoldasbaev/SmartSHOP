@@ -22,7 +22,7 @@ class EmployeeSeeder extends Seeder
             'password' => Hash::make(7117),
             'pincode' => md5(7117),
             'role' => 'ceo',
-            'flex' => 1
+            'flex' => 1,
         ]);
         Employee::create([
             'branch_id' => 1,

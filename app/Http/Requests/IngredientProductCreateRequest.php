@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Controllers\Api\V1\ApiResponse;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class IngredientProductCreateRequest extends FormRequest
@@ -27,10 +27,10 @@ class IngredientProductCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_id'=> 'required|exists:products,id',
-            'ingredients'=> 'required|array',
-            'ingredients.*.ingredient_id'=> 'required|exists:ingredients,id',
-            'ingredients.*.count'=> 'required',
+            'product_id' => 'required|exists:products,id',
+            'ingredients' => 'required|array',
+            'ingredients.*.ingredient_id' => 'required|exists:ingredients,id',
+            'ingredients.*.count' => 'required',
         ];
     }
 

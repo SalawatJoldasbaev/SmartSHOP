@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductFactory extends Factory
 {
     protected $model = Product::class;
+
     /**
      * Define the model's default state.
      *
@@ -23,20 +24,20 @@ class ProductFactory extends Factory
             'brand' => $this->faker->word(2),
             'cost_price' => [
                 'currency_id' => 2,
-                'price' => $this->faker->numberBetween($min = 15, $max = 45)
+                'price' => $this->faker->numberBetween($min = 15, $max = 45),
             ],
             'min_price' => [
                 'currency_id' => 1,
-                'price' => $this->faker->numberBetween($min = 300000, $max = 500000)
+                'price' => $this->faker->numberBetween($min = 300000, $max = 500000),
             ],
             'max_price' => [
                 'currency_id' => 1,
-                'price' => $this->faker->numberBetween($min = 500000, $max = 1500000)
+                'price' => $this->faker->numberBetween($min = 500000, $max = 1500000),
             ],
             'whole_price' => [
                 'currency_id' => 2,
-                'price' => $this->faker->numberBetween($min = 30, $max = 50)
-            ]
+                'price' => $this->faker->numberBetween($min = 30, $max = 50),
+            ],
         ];
     }
 }

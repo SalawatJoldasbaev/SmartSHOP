@@ -61,6 +61,7 @@ class WarehouseLogic
                 ]);
             }
         }
+
         return true;
     }
 
@@ -76,7 +77,7 @@ class WarehouseLogic
                 if ($category_id) {
                     $query->where('category_id', $category_id);
                 }
-                $query->where('name', 'like', '%' . $search . '%');
+                $query->where('name', 'like', '%'.$search.'%');
             })->paginate(30);
         $final = [
             'current_page' => $warehouses->currentPage(),
@@ -119,6 +120,7 @@ class WarehouseLogic
                 $final['data'][] = $temp;
             }
         }
+
         return $final;
     }
 }

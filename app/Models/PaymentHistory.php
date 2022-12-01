@@ -11,8 +11,9 @@ class PaymentHistory extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     protected $casts = [
-        'amount_paid' => 'json'
+        'amount_paid' => 'json',
     ];
 
     public function employee()

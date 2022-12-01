@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -22,7 +21,7 @@ class UserFactory extends Factory
             'phone' => $this->faker->unique()->tollFreePhoneNumber(),
             'type' => $this->faker->randomElement(['Y', 'J']),
             'tin' => $this->faker->randomNumber(9, true),
-            'about' => $this->faker->words(10, true)
+            'about' => $this->faker->words(10, true),
         ];
     }
 

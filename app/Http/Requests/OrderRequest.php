@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Http\Controllers\Api\V1\ApiResponse;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class OrderRequest extends FormRequest
@@ -37,7 +37,7 @@ class OrderRequest extends FormRequest
             'orders.*.product_id' => 'required|exists:products,id',
             'orders.*.count' => 'required',
             'orders.*.unit_id' => 'required|exists:units,id',
-            'orders.*.price' => 'required'
+            'orders.*.price' => 'required',
         ];
     }
 

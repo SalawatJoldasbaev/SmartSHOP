@@ -19,12 +19,14 @@ class BranchController extends Controller
             'name' => $request->name,
             'is_main' => $request->is_main,
         ]);
+
         return ApiResponse::success();
     }
 
     public function show(Request $request)
     {
         $branches = Branch::all(['id', 'name', 'is_main']);
+
         return ApiResponse::success(data:$branches);
     }
 
@@ -38,6 +40,7 @@ class BranchController extends Controller
             'name' => $request->name,
             'is_main' => $request->is_main,
         ]);
+
         return ApiResponse::success();
     }
 }

@@ -12,7 +12,6 @@ use App\Models\WarehouseOrder;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use ProtoneMedia\LaravelCrossEloquentSearch\Search;
 
 class ProductController extends Controller
 {
@@ -67,12 +66,13 @@ class ProductController extends Controller
             ]);
             $warhouse = Warehouse::setWarehouse($product->id, $request->warehouse['count'], $request->warehouse['unit_id']);
         }
+
         return ApiResponse::success(data:$product);
     }
 
     public function index(Request $request)
     {
-        $delete = $request->delete == "true" ? true : false;
+        $delete = $request->delete == 'true' ? true : false;
         $category_id = $request->category_id;
         $search = $request->search;
         $count = $request->count;
@@ -84,7 +84,7 @@ class ProductController extends Controller
                 $search = str_replace('#', '', $search);
                 $query->where('id', $search);
             } else {
-                $query->where('name', 'like', '%' . $search . '%');
+                $query->where('name', 'like', '%'.$search.'%');
             }
         })->orderBy('id', 'desc');
         if (isset($count)) {
@@ -171,6 +171,7 @@ class ProductController extends Controller
             ];
             $final['data'][] = $temp;
         }
+
         return ApiResponse::success(data:$final);
     }
 
@@ -214,6 +215,7 @@ class ProductController extends Controller
             'max_price' => $request->price_max,
             'whole_price' => $request->price_wholesale,
         ]);
+
         return ApiResponse::success();
     }
 
@@ -226,6 +228,7 @@ class ProductController extends Controller
         }
 
         $product = Product::findOrFail($id)->delete();
+
         return ApiResponse::success();
     }
 }

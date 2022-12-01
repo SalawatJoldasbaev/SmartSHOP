@@ -46,6 +46,5 @@ class ProductSeeder extends Seeder
             'date' => Carbon::today(),
             'active' => true,
         ]);
-
     }
 }

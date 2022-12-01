@@ -2,9 +2,9 @@
 
 namespace App\Exports;
 
-use App\Models\Unit;
-use App\Models\Product;
 use App\Models\Currency;
+use App\Models\Product;
+use App\Models\Unit;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 
@@ -30,38 +30,39 @@ class ProductExport implements FromView
                     'id' => $product->category_id,
                     'name' => $product->category->name,
                 ],
-                'image'=> $product->image,
+                'image' => $product->image,
                 'name' => $product->name,
                 'brand' => $product->brand,
                 'cost_price' => [
                     'code' => $cost_price->code,
-                    'price' => $product->cost_price['price']
+                    'price' => $product->cost_price['price'],
                 ],
                 'min_price' => [
                     'code' => $min_price->code,
-                    'price' => $product->min_price['price']
+                    'price' => $product->min_price['price'],
                 ],
                 'max_price' => [
                     'code' => $max_price->code,
-                    'price' => $product->max_price['price']
+                    'price' => $product->max_price['price'],
                 ],
                 'whole_price' => [
                     'name' => $whole_price->name,
                     'code' => $whole_price->code,
-                    'price' => $product->whole_price['price']
+                    'price' => $product->whole_price['price'],
                 ],
                 'warehouse' => isset($product->warehouse) ? [
                     'unit' => [
                         'id' => $unit->id,
                         'name' => $unit->name,
-                        'code' => $unit->unit
+                        'code' => $unit->unit,
                     ],
-                    'count' => $product->warehouse->count
+                    'count' => $product->warehouse->count,
                 ] : null,
-                'uuid'=> $product->uuid,
+                'uuid' => $product->uuid,
             ];
             $final[] = $temp;
         }
+
         return view('export.product', ['products' => $final]);
     }
 }

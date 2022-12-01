@@ -12,6 +12,7 @@ class Warehouse extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     protected $casts = [];
 
     public function scopeSetWarehouse($query, $product_id, $count, $unit_id)
@@ -43,6 +44,7 @@ class Warehouse extends Model
             ]);
         }
         $product = $this->where('active', true)->where('product_id', $product_id)->first();
+
         return $product;
     }
 

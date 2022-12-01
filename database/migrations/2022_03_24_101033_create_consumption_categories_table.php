@@ -22,73 +22,72 @@ return new class extends Migration
                     'uz' => 'Boshqa',
                     'en' => 'Other',
                     'ru' => 'Другой',
-                    'qr' => 'Basqa'
-                ]
+                    'qr' => 'Basqa',
+                ],
             ],
             [
                 'name' => [
                     'uz' => 'Ma\'muriy',
                     'en' => 'Administrative',
                     'ru' => 'Административные',
-                    'qr' => 'Administrativ'
-                ]
+                    'qr' => 'Administrativ',
+                ],
             ],
             [
                 'name' => [
                     'uz' => 'Ijara',
                     'en' => 'Rent',
                     'ru' => 'Аренда',
-                    'qr' => 'Ijara'
-                ]
+                    'qr' => 'Ijara',
+                ],
             ],
             [
                 'name' => [
                     'uz' => 'Ish haqi',
                     'en' => 'Salary',
                     'ru' => 'Зарплата',
-                    'qr' => 'Is haqi'
-                ]
+                    'qr' => 'Is haqi',
+                ],
             ],
             [
                 'name' => [
                     'uz' => 'Investitsiyalar',
                     'en' => 'Investments',
                     'ru' => 'Инвестиции',
-                    'qr' => 'Investitsiyalar'
-                ]
+                    'qr' => 'Investitsiyalar',
+                ],
             ],
             [
                 'name' => [
                     'uz' => 'Ofis   ',
                     'en' => 'Office',
                     'ru' => 'Офис',
-                    'qr' => 'Ofis'
-                ]
+                    'qr' => 'Ofis',
+                ],
             ],
             [
                 'name' => [
                     'uz' => 'Soliqlar',
                     'en' => 'Taxes',
                     'ru' => 'Налоги',
-                    'qr' => 'Saliqlar'
-                ]
+                    'qr' => 'Saliqlar',
+                ],
             ],
             [
                 'name' => [
                     'uz' => 'Maishiy',
                     'en' => 'Household',
                     'ru' => 'Домашнее хозяйство',
-                    'qr' => 'Uy xojalig\'i'
-                ]
+                    'qr' => 'Uy xojalig\'i',
+                ],
             ],
         ];
         foreach ($categories as $category) {
             ConsumptionCategory::create([
-                'name' => $category['name']
+                'name' => $category['name'],
             ]);
         }
     }
-
 
     public function down(): void
     {

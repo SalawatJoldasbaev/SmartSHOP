@@ -21,6 +21,7 @@ class ProductPolicy
 
     /**
      * Determine whether the user can update the model.
+     *
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function update()

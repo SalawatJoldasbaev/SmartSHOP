@@ -11,6 +11,7 @@ class IngredientWarehouse extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     //protected $casts = [];
     public $timestamps = false;
 

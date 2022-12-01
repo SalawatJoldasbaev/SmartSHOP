@@ -19,5 +19,4 @@ class UserPolicy
     {
         return Auth::user()->role == 'ceo' || Auth::user()->role == 'admin';
     }
-
 }

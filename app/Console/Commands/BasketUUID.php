@@ -33,7 +33,7 @@ class BasketUUID extends Command
         foreach ($qrcodes as $code) {
             $basket = Basket::find($code->additional['basket_id']);
             $basket->update([
-                'uuid'=> $code->uuid
+                'uuid' => $code->uuid,
             ]);
         }
     }

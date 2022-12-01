@@ -34,6 +34,7 @@ class UserUpdateRequest extends FormRequest
             'about' => 'nullable',
         ];
     }
+
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(ApiResponse::error($validator->errors()->first(), 422));

@@ -15,6 +15,7 @@ class ConsumptionController extends Controller
     public function Categories(Request $request)
     {
         $categories = ConsumptionCategory::all(['id', 'name']);
+
         return ApiResponse::success(data: $categories);
     }
 
@@ -45,7 +46,7 @@ class ConsumptionController extends Controller
             $balance = [
                 'card' => 0,
                 'cash' => 0,
-                'sum' => 0
+                'sum' => 0,
             ];
             if ($request->type == 'consumption') {
                 $balance[$payment_type] -= $request->price;
@@ -62,13 +63,14 @@ class ConsumptionController extends Controller
             $cashier = Cashier::create([
                 'date' => $today,
                 'balance' => $balance,
-                'profit' => $profit
+                'profit' => $profit,
             ]);
         }
         $data = $request->all();
         $data['employee_id'] = $request->user()->id;
         $data['consumption_category_id'] = $request->category_id;
         Consumption::create($data);
+
         return ApiResponse::success();
     }
 
@@ -92,7 +94,7 @@ class ConsumptionController extends Controller
                     'card' => collect($sum)->where('payment_type', 'card')->sum('price'),
                     'cash' => collect($sum)->where('payment_type', 'cash')->sum('price'),
                 ],
-                'items' => []
+                'items' => [],
             ],
         ];
         foreach ($paginate as $consumption) {
@@ -106,8 +108,8 @@ class ConsumptionController extends Controller
                 'payment_type' => $consumption->payment_type,
                 'employee' => [
                     'id' => $consumption->employee_id,
-                    'name' => $consumption->employee->name ?? null
-                ]
+                    'name' => $consumption->employee->name ?? null,
+                ],
             ];
         }
 

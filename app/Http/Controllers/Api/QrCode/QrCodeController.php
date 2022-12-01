@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api\QrCode;
 
-use App\Models\Product;
+use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Http\Controllers\Controller;
 use App\Models\Currency;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\Api\V1\ApiResponse;
 
 class QrCodeController extends Controller
 {
@@ -15,7 +15,8 @@ class QrCodeController extends Controller
     {
         $uuid = $request->uuid ?? '123';
         $type = $request->type;
-        return QrCode::size(250)->generate($type . "\n" . $uuid);
+
+        return QrCode::size(250)->generate($type."\n".$uuid);
     }
 
     public function code(Request $request)
@@ -43,7 +44,7 @@ class QrCodeController extends Controller
             $product->cost_price['currency_id'],
             $product->max_price['currency_id'],
             $product->whole_price['currency_id'],
-            $product->min_price['currency_id']
+            $product->min_price['currency_id'],
         ])->get()->collect();
         $cost_price = $currency->where('id', $product->cost_price['currency_id'])->first();
         $min_price = $currency->where('id', $product->min_price['currency_id'])->first();
@@ -53,9 +54,9 @@ class QrCodeController extends Controller
             'id' => $product->id,
             'category' => [
                 'id' => $product->category_id,
-                'min_percent' =>  $product->category?->min_percent,
-                'max_percent' =>  $product->category?->max_percent,
-                'whole_percent' =>  $product->category?->whole_percent
+                'min_percent' => $product->category?->min_percent,
+                'max_percent' => $product->category?->max_percent,
+                'whole_percent' => $product->category?->whole_percent,
             ],
             'image' => $product->image,
             'name' => $product->name,
@@ -64,39 +65,40 @@ class QrCodeController extends Controller
                 'currency_id' => $product->cost_price['currency_id'],
                 'name' => $cost_price['name'],
                 'code' => $cost_price['code'],
-                'price' => $product->cost_price['price']
+                'price' => $product->cost_price['price'],
             ],
             'min_price' => [
                 'currency_id' => $product->min_price['currency_id'],
                 'name' => $min_price['name'],
                 'code' => $min_price['code'],
-                'price' => $product->min_price['price']
+                'price' => $product->min_price['price'],
             ],
             'max_price' => [
                 'currency_id' => $product->max_price['currency_id'],
                 'name' => $max_price['name'],
                 'code' => $max_price['code'],
-                'price' => $product->max_price['price']
+                'price' => $product->max_price['price'],
             ],
             'whole_price' => [
                 'currency_id' => $product->whole_price['currency_id'],
                 'name' => $whole_price['name'],
                 'code' => $whole_price['code'],
-                'price' => $product->whole_price['price']
+                'price' => $product->whole_price['price'],
             ],
             'warehouse' => isset($product->Warehouse) ? [
                 'unit' => [
                     'id' => $product->warehouse->unit->id,
                     'name' => $product->warehouse->unit->name,
-                    'code' => $product->warehouse->unit->unit
+                    'code' => $product->warehouse->unit->unit,
                 ],
-                'count' => $product->Warehouse->count
+                'count' => $product->Warehouse->count,
             ] : null,
             'qr_code_link' => $product->uuid ? route('qrcode', [
                 'uuid' => $product->uuid,
-                'type' => 'product'
+                'type' => 'product',
             ]) : null,
         ];
+
         return ApiResponse::success(data: $data);
     }
 

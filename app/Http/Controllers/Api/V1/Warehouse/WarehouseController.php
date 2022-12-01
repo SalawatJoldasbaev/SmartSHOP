@@ -13,15 +13,18 @@ use Illuminate\Http\Request;
 class WarehouseController extends Controller
 {
     private $warehouseLogic;
+
     public function __construct()
     {
         $this->warehouseLogic = new WarehouseLogic();
     }
+
     public function create(WarehouseAddRequest $request)
     {
         $employee = $request->user();
         if ($employee->branch->is_main === true) {
             $this->warehouseLogic->SetWarehouse($request);
+
             return ApiResponse::success();
         } else {
             return ApiResponse::error('your not allowed', 403);
@@ -32,7 +35,7 @@ class WarehouseController extends Controller
     {
         $employee = $request->user();
         $branch_id = $request->branch_id;
-        if (!$branch_id) {
+        if (! $branch_id) {
             $branch_id = $employee->branch_id;
         }
 
@@ -41,13 +44,15 @@ class WarehouseController extends Controller
             category_id: $request->category_id,
             branch_id: $branch_id
         );
+
         return ApiResponse::success(data: $warehouse);
     }
+
     public function less(Request $request)
     {
         $employee = $request->user();
         $branch_id = $request->branch_id;
-        if (!$branch_id) {
+        if (! $branch_id) {
             $branch_id = $employee->branch_id;
         }
         $warehouse = $this->warehouseLogic->getWarehouse(
@@ -56,6 +61,7 @@ class WarehouseController extends Controller
             category_id: $request->category_id,
             branch_id: $branch_id
         );
+
         return ApiResponse::success(data: $warehouse);
     }
 
@@ -80,6 +86,7 @@ class WarehouseController extends Controller
                 }
             }
         }
+
         return ApiResponse::success(data: $final);
     }
 
@@ -125,6 +132,7 @@ class WarehouseController extends Controller
                 'created_at' => $basket->created_at->format('Y-m-d H:i:s'),
             ];
         }
+
         return ApiResponse::success(data: $final);
     }
 
@@ -132,9 +140,11 @@ class WarehouseController extends Controller
     {
         if ($basket->type == 'branch to branch') {
             $data = new WarehouseToBranchController();
+
             return $data->take($request, $basket);
         } elseif ($basket->type == 'defect' or $basket->type == 'gift') {
             $data = new WarehouseDefectController();
+
             return $data->take($request, $basket);
         }
     }
@@ -153,7 +163,7 @@ class WarehouseController extends Controller
                     'name' => $warehouse[0]->unit->name,
                     'code' => $warehouse[0]->unit->unit,
                 ],
-                'by_branch' => []
+                'by_branch' => [],
             ];
             foreach ($warehouse as $item) {
                 $temp['by_branch'][] = [
@@ -164,6 +174,7 @@ class WarehouseController extends Controller
             }
             $final[] = $temp;
         }
+
         return ApiResponse::success(data: $final);
     }
 }

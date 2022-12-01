@@ -14,7 +14,6 @@ class WarehouseObserver
      */
     public function created(Warehouse $warehouse)
     {
-
     }
 
     /**

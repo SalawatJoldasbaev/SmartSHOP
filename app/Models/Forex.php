@@ -15,6 +15,6 @@ class Forex extends Model
 
     public function currency()
     {
-        return "hi";
+        return 'hi';
     }
 }

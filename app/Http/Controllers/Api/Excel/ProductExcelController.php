@@ -20,6 +20,7 @@ class ProductExcelController extends Controller
     {
         $file = $request->file('file');
         Excel::import(new ProductImport, $file);
+
         return ApiResponse::success();
     }
 }

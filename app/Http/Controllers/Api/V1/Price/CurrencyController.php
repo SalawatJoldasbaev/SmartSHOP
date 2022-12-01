@@ -38,12 +38,12 @@ class CurrencyController extends Controller
             $final_response[] = $temp;
             $temp = [];
         }
+
         return ApiResponse::success(data:$final_response);
     }
 
     public function setCurrency(Request $request)
     {
-
         $validation = Validator::make($request->all(), [
             'rate' => 'required',
             'currency_id' => 'required|exists:currencies,id',
@@ -58,7 +58,7 @@ class CurrencyController extends Controller
         $rate = $request->rate;
 
         $currency = Forex::where('currency_id', $currency_id)->where('to_currency_id', $to_currency_id)->first();
-        if (!$currency) {
+        if (! $currency) {
             Forex::create([
                 'currency_id' => $currency_id,
                 'to_currency_id' => $to_currency_id,
@@ -110,6 +110,7 @@ class CurrencyController extends Controller
                 'whole_price' => $whole,
             ]);
         }
+
         return ApiResponse::success();
     }
 }

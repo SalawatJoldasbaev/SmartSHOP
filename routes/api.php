@@ -96,7 +96,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/finshed/{basket}', 'finshed');
         });
 
-
     Route::get('/currency', [CurrencyController::class, 'index']);
     Route::post('/currency', [CurrencyController::class, 'setCurrency']);
     Route::post('/warehouse/toBranch', [WarehouseToBranchController::class, 'toBranch']);

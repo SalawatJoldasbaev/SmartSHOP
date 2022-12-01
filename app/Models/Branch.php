@@ -12,6 +12,7 @@ class Branch extends Model
     protected $fillable = [
         'name', 'is_main',
     ];
+
     //protected $guarded = ['id'];
     protected $casts = [
         'is_main' => 'boolean',

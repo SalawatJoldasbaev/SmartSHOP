@@ -11,7 +11,8 @@ class QrCode extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     protected $casts = [
-        'additional' => 'json'
+        'additional' => 'json',
     ];
 }

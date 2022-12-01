@@ -47,6 +47,7 @@ class WarehouseAddRequest extends FormRequest
             '*.whole_price.price' => 'required',
         ];
     }
+
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(ApiResponse::error($validator->errors()->first(), 422));

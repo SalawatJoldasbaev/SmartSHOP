@@ -16,6 +16,7 @@ class ImageController extends Controller
                 $path[] = asset(str_replace('public', 'storage', $image->store('/public/images')));
             }
         }
+
         return $path;
     }
 }

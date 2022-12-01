@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Http\Controllers\Api\V1\ApiResponse;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class IngredientUpdateRequest extends FormRequest
@@ -22,8 +22,8 @@ class IngredientUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=> 'required',
-            'unit_id'=> 'required|exists:units,id'
+            'name' => 'required',
+            'unit_id' => 'required|exists:units,id',
         ];
     }
 

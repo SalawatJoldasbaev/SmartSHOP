@@ -11,8 +11,9 @@ class Order extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     protected $casts = [
-        'price' => 'array'
+        'price' => 'array',
     ];
 
     public function product()

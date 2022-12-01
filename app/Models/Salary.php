@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Salary extends Model
 {
@@ -12,6 +11,7 @@ class Salary extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     //protected $casts = [];
     public function employee()
     {

@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Http\Controllers\Api\V1\ApiResponse;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class IngredientWarehouseCreateRequest extends FormRequest
@@ -27,11 +27,11 @@ class IngredientWarehouseCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'usd_rate'=> 'required',
-            'ingredients'=> 'required|array',
-            'ingredients.*.ingredient_id'=> 'required|exists:ingredients,id',
-            'ingredients.*.count'=> 'required',
-            'ingredients.*.price'=> 'required'
+            'usd_rate' => 'required',
+            'ingredients' => 'required|array',
+            'ingredients.*.ingredient_id' => 'required|exists:ingredients,id',
+            'ingredients.*.count' => 'required',
+            'ingredients.*.price' => 'required',
         ];
     }
 

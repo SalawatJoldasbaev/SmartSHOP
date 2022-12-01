@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Forex;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,10 +20,9 @@ return new class extends Migration
         Forex::create([
             'currency_id' => 2,
             'to_currency_id' => 1,
-            'rate' => 10400
+            'rate' => 10400,
         ]);
     }
-
 
     public function down(): void
     {

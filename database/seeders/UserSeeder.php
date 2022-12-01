@@ -20,6 +20,5 @@ class UserSeeder extends Seeder
             'phone' => '+998901231212',
             'type' => 'J',
         ]);
-
     }
 }

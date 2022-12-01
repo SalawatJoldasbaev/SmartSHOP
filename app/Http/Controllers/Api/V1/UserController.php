@@ -48,7 +48,7 @@ class UserController extends Controller
             ->when($type, function ($query) use ($type) {
                 $query->where('type', $type);
             })->orderBy('balance');
-        $users = Search::new ()->add($users, ['full_name', 'phone'])
+        $users = Search::new()->add($users, ['full_name', 'phone'])
             ->beginWithWildcard()
             ->paginate(60)
             ->search($search);
@@ -65,6 +65,7 @@ class UserController extends Controller
         foreach ($users as $user) {
             $final['data']['clients'][] = $user;
         }
+
         return ApiResponse::success(data:$final);
     }
 
@@ -83,6 +84,7 @@ class UserController extends Controller
         }
 
         $client->update($request->all());
+
         return ApiResponse::success();
     }
 }

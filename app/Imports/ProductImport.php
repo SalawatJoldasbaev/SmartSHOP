@@ -16,8 +16,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
 {
     /**
-     * @param array $row
-     *
+     * @param  array  $row
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function model(array $row)
@@ -27,7 +26,7 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
             return;
         }
         $category = Category::where('name', $data['category'])->first();
-        if (!$category) {
+        if (! $category) {
             $category = Category::create([
                 'parent_id' => 0,
                 'name' => $data['category'],
@@ -38,15 +37,15 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
         }
         $product_name = '';
         $list = [];
-        foreach (explode(" ", $data['product_name']) as $key => $value) {
+        foreach (explode(' ', $data['product_name']) as $key => $value) {
             if (strlen(trim($value)) > 0) {
                 $list[] = trim($value);
             }
         }
-        $product_name = implode(" ", $list);
+        $product_name = implode(' ', $list);
         //warehouse_count
         $product = Product::where('name', $product_name)->first();
-        if (!$product) {
+        if (! $product) {
             $max = Currency::where('code', $data['price_max_currency'])->first();
             $wholesale = Currency::where('code', $data['wholesale_price_currency'])->first();
             $cost = Currency::where('code', $data['cost_price_currency'])->first();
@@ -88,6 +87,7 @@ class ProductImport implements ToModel, WithCalculatedFormulas, WithHeadingRow
                 ]);
                 $warhouse = Warehouse::setWarehouse($product->id, $data['warehouse_count'], 1);
             }
+
             return $product;
         }
     }

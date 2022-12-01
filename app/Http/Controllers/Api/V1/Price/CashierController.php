@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1\Price;
 
-use Carbon\Carbon;
-use App\Models\Cashier;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\V1\ApiResponse;
+use App\Http\Controllers\Controller;
+use App\Models\Cashier;
 use App\Models\Category;
 use App\Models\Profit;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CashierController extends Controller
 {
@@ -31,22 +31,23 @@ class CashierController extends Controller
 
         return ApiResponse::success(data: $data);
     }
+
     public function monthly(Request $request)
     {
         $from = $request->from ?? Carbon::today()->format('Y-m-d');
         $to = $request->to ?? Carbon::today()->format('Y-m-d');
         $cashier = Cashier::select(
-            DB::raw("MONTH(date) as month"),
-            DB::raw("YEAR(date) as year"),
+            DB::raw('MONTH(date) as month'),
+            DB::raw('YEAR(date) as year'),
             DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date)) as monthyear"),
-            "balance",
+            'balance',
         )
             ->whereDate('date', '>=', $from)->whereDate('date', '<=', $to)->get()->collect();
         $cashier = $cashier->sortBy('month')->sortBy('year')->groupBy('monthyear');
         $final = [];
         foreach ($cashier as $key => $value) {
             $lastDay = Carbon::create($value[0]->year, $value[0]->month)->endOfMonth();
-            $profit = Profit::whereDate('date', '>=', $value[0]->year . "-" . $value[0]->month . "-01")
+            $profit = Profit::whereDate('date', '>=', $value[0]->year.'-'.$value[0]->month.'-01')
                 ->whereDate('date', '<=', $lastDay)
                 ->sum('profit');
             $collect = collect($value);
@@ -55,9 +56,10 @@ class CashierController extends Controller
                 'year' => $value[0]->year,
                 'card' => $collect->sum('balance.card'),
                 'cash' => $collect->sum('balance.cash'),
-                'profit' => $profit
+                'profit' => $profit,
             ];
         }
+
         return ApiResponse::success(data: $final);
     }
 
@@ -78,9 +80,10 @@ class CashierController extends Controller
                 'category_id' => $category->id,
                 'category_name' => $category->name,
                 'amount' => $profit->sum('sum'),
-                'profit' => $profit->sum('profit')
+                'profit' => $profit->sum('profit'),
             ];
         }
+
         return ApiResponse::success(data: $final);
     }
 }

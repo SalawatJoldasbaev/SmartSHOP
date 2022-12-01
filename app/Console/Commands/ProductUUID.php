@@ -33,7 +33,7 @@ class ProductUUID extends Command
         foreach ($qrcodes as $code) {
             $product = Product::where('id', $code->additional['product_id'])->withTrashed()->first();
             $product->update([
-                'uuid'=> $code->uuid
+                'uuid' => $code->uuid,
             ]);
         }
     }

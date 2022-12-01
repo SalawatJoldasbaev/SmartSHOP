@@ -37,6 +37,7 @@ class SalaryController extends Controller
                 'sum' => collect($value)->sum('salary'),
             ];
         }
+
         return ApiResponse::success(data:$final);
     }
 
@@ -46,7 +47,7 @@ class SalaryController extends Controller
         $from = $request->from;
         $to = $request->to;
 
-        $salaries = Salary::select('date', 'salary', DB::raw("MONTH(date) as month"), DB::raw("YEAR(date) as year"), DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date)) as monthyear"))->where('employee_id', $employee_id)
+        $salaries = Salary::select('date', 'salary', DB::raw('MONTH(date) as month'), DB::raw('YEAR(date) as year'), DB::raw("CONCAT_WS('-',MONTH(date),YEAR(date)) as monthyear"))->where('employee_id', $employee_id)
             ->whereDate('date', '>=', $from)
             ->whereDate('date', '<=', $to)
             ->get()->collect();
@@ -85,6 +86,7 @@ class SalaryController extends Controller
                 'flex' => $request->flex,
             ]);
         }
+
         return ApiResponse::success();
     }
 }

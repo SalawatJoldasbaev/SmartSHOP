@@ -18,25 +18,26 @@ class IngredientWarehouseController extends Controller
     {
         $ingredients = $request->ingredients;
         $basket = IngredientWarehouseBasket::create([
-            'usd_rate'=> $request->usd_rate,
-            'employee_id'=> $request->user()->id,
+            'usd_rate' => $request->usd_rate,
+            'employee_id' => $request->user()->id,
         ]);
         foreach ($ingredients as $ingredient) {
             IngredientWarehouseOrder::create([
-                'ingredient_warehouse_basket_id'=> $basket->id,
-                'ingredient_id'=> $ingredient['ingredient_id'],
-                'count'=> $ingredient['count'],
-                'price'=> $ingredient['price'],
+                'ingredient_warehouse_basket_id' => $basket->id,
+                'ingredient_id' => $ingredient['ingredient_id'],
+                'count' => $ingredient['count'],
+                'price' => $ingredient['price'],
             ]);
             IngredientWarehouse::create([
-                'ingredient_warehouse_basket_id'=> $basket->id,
-                'ingredient_id'=> $ingredient['ingredient_id'],
-                'count'=> $ingredient['count'],
-                'cost_price'=> $ingredient['price'],
-                'ordered_at'=> Carbon::now(),
-                'active'=> true
+                'ingredient_warehouse_basket_id' => $basket->id,
+                'ingredient_id' => $ingredient['ingredient_id'],
+                'count' => $ingredient['count'],
+                'cost_price' => $ingredient['price'],
+                'ordered_at' => Carbon::now(),
+                'active' => true,
             ]);
         }
+
         return ApiResponse::success();
     }
 
@@ -50,43 +51,44 @@ class IngredientWarehouseController extends Controller
                 continue;
             }
 
-            if (!array_key_exists($ingredient->ingredient_id, $final)) {
+            if (! array_key_exists($ingredient->ingredient_id, $final)) {
                 $final[$ingredient->ingredient_id] = [
-                    'ingredient_id'=> $ingredient->ingredient_id,
-                    'ingredient_name'=> $ingredient->ingredient->name,
-                    'unit_id'=> $ingredient->ingredient->unit_id,
-                    'count'=> $ingredient->count,
-                    'items'=>[
+                    'ingredient_id' => $ingredient->ingredient_id,
+                    'ingredient_name' => $ingredient->ingredient->name,
+                    'unit_id' => $ingredient->ingredient->unit_id,
+                    'count' => $ingredient->count,
+                    'items' => [
                         [
-                            'count'=> $ingredient->count,
-                            'price'=> $ingredient->cost_price,
-                            'usd_rate'=> $basket->usd_rate,
-                            'ordered_at'=> $basket->created_at
-                        ]
-                    ]
+                            'count' => $ingredient->count,
+                            'price' => $ingredient->cost_price,
+                            'usd_rate' => $basket->usd_rate,
+                            'ordered_at' => $basket->created_at,
+                        ],
+                    ],
                 ];
             } else {
                 $final[$ingredient->ingredient_id]['count'] += $ingredient->count;
                 $final[$ingredient->ingredient_id]['items'][] = [
-                    'count'=> $ingredient->count,
-                    'price'=> $ingredient->cost_price,
-                    'usd_rate'=> $basket->usd_rate,
-                    'ordered_at'=> $basket->created_at
+                    'count' => $ingredient->count,
+                    'price' => $ingredient->cost_price,
+                    'usd_rate' => $basket->usd_rate,
+                    'ordered_at' => $basket->created_at,
                 ];
             }
         }
         $ingredients = Ingredient::all();
         foreach ($ingredients as $ingredient) {
-            if (!array_key_exists($ingredient->id, $final)) {
+            if (! array_key_exists($ingredient->id, $final)) {
                 $final[$ingredient->id] = [
-                    'ingredient_id'=> $ingredient->id,
-                    'ingredient_name'=> $ingredient->name,
-                    'unit_id'=> $ingredient->unit_id,
-                    'count'=> 0,
-                    'items'=>[]
+                    'ingredient_id' => $ingredient->id,
+                    'ingredient_name' => $ingredient->name,
+                    'unit_id' => $ingredient->unit_id,
+                    'count' => 0,
+                    'items' => [],
                 ];
             }
         }
+
         return ApiResponse::data(true, 'success', array_values($final));
     }
 
@@ -94,26 +96,27 @@ class IngredientWarehouseController extends Controller
     {
         $baskets = IngredientWarehouseBasket::orderBy('id', 'desc')->paginate(30);
         $final = [
-            'last_page'=> $baskets->lastPage(),
-            'data'=> []
+            'last_page' => $baskets->lastPage(),
+            'data' => [],
         ];
         foreach ($baskets as $basket) {
             $temp = [
-                'basket_id'=> $basket->id,
-                'usd_rate'=> $basket->usd_rate,
-                'ordered_at'=> $basket->created_at,
-                'orders'=> []
+                'basket_id' => $basket->id,
+                'usd_rate' => $basket->usd_rate,
+                'ordered_at' => $basket->created_at,
+                'orders' => [],
             ];
             foreach ($basket->orders as $order) {
                 $temp['orders'][] = [
-                    'ingredient_id'=> $order->ingredient_id,
-                    'ingredient_name'=> $order->ingredient->name,
-                    'count'=> $order->count,
-                    'price'=> $order->price,
+                    'ingredient_id' => $order->ingredient_id,
+                    'ingredient_name' => $order->ingredient->name,
+                    'count' => $order->count,
+                    'price' => $order->price,
                 ];
             }
             $final['data'][] = $temp;
         }
+
         return ApiResponse::success(data:$final);
     }
 }

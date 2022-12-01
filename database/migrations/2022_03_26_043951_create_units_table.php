@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up():void
+    public function up(): void
     {
         Schema::create('units', function (Blueprint $table) {
             $table->id();
@@ -18,37 +18,36 @@ return new class extends Migration
         });
 
         Unit::create([
-            'name'=> 'Piece',
-            'unit'=> 'pcs',
+            'name' => 'Piece',
+            'unit' => 'pcs',
         ]);
         Unit::create([
-            'name'=> 'Tone',
-            'unit'=> 't',
+            'name' => 'Tone',
+            'unit' => 't',
         ]);
         Unit::create([
-            'name'=> 'Kilogram',
-            'unit'=> 'kg',
+            'name' => 'Kilogram',
+            'unit' => 'kg',
         ]);
         Unit::create([
-            'name'=> 'Gram',
-            'unit'=> 'gr',
+            'name' => 'Gram',
+            'unit' => 'gr',
         ]);
         Unit::create([
-            'name'=> 'Meter',
-            'unit'=> 'm',
+            'name' => 'Meter',
+            'unit' => 'm',
         ]);
         Unit::create([
-            'name'=> 'Centimeter',
-            'unit'=> 'cm',
+            'name' => 'Centimeter',
+            'unit' => 'cm',
         ]);
         Unit::create([
-            'name'=> 'Liter',
-            'unit'=> 'l',
+            'name' => 'Liter',
+            'unit' => 'l',
         ]);
     }
 
-
-    public function down():void
+    public function down(): void
     {
         Schema::dropIfExists('units');
     }

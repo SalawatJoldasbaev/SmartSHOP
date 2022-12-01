@@ -37,7 +37,7 @@ class OrderController extends Controller
         foreach ($warehouseBaskets as $warehouseBasket) {
             $warehouseBasketItems = $warehouseBasket->items;
             foreach ($warehouseBasketItems as $item) {
-                if (key_exists($item->product_id, $warehouseGivenProducts)) {
+                if (array_key_exists($item->product_id, $warehouseGivenProducts)) {
                     $warehouseGivenProducts[$item->product_id] += $item->count;
                 } else {
                     $warehouseGivenProducts[$item->product_id] = $item->count;
@@ -91,16 +91,16 @@ class OrderController extends Controller
                 $cost_price = ($product->cost_price['price'] * $order['count']);
             }
 
-            if (key_exists($product->category_id, $prices)) {
+            if (array_key_exists($product->category_id, $prices)) {
                 $prices[$product->category_id] = [
                     'category_id' => $product->category_id,
-                    'price' =>  $prices[$product->category_id]['price'] + $order['count'] * $order['price'],
+                    'price' => $prices[$product->category_id]['price'] + $order['count'] * $order['price'],
                     'profit' => $prices[$product->category_id]['profit'] + (($order['count'] * $order['price']) - $cost_price),
                 ];
             } else {
                 $prices[$product->category_id] = [
                     'category_id' => $product->category_id,
-                    'price' =>  $order['count'] * $order['price'],
+                    'price' => $order['count'] * $order['price'],
                     'profit' => (($order['count'] * $order['price']) - $cost_price),
                 ];
             }
@@ -142,7 +142,7 @@ class OrderController extends Controller
         }
         $date = Carbon::today()->format('Y-m-d');
         $cashier = Cashier::where('branch_id', $employee->branch_id)->date($date)->first();
-        if (!$cashier) {
+        if (! $cashier) {
             $cashier = Cashier::create([
                 'branch_id' => $employee->branch_id,
                 'date' => $date,
@@ -150,7 +150,7 @@ class OrderController extends Controller
                     'card' => $card,
                     'cash' => $cash,
                     'sum' => $sum,
-                ]
+                ],
             ]);
         } else {
             $cashier->update([
@@ -234,12 +234,14 @@ class OrderController extends Controller
                 ]);
             }
         }
+
         return ApiResponse::success(data: $final);
     }
 
     public function UsdToUzs($usd, $count = 1)
     {
         $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
-        return (($usd * $usdToUzs->rate) * $count);
+
+        return ($usd * $usdToUzs->rate) * $count;
     }
 }

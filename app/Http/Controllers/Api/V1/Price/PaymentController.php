@@ -8,7 +8,6 @@ use App\Models\Basket;
 use App\Models\Cashier;
 use App\Models\Forex;
 use App\Models\PaymentHistory;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -89,7 +88,7 @@ class PaymentController extends Controller
         }
         $user = $basket->user;
         $user->update([
-            'balance' => $user->balance + $sum
+            'balance' => $user->balance + $sum,
         ]);
         $profit = $paid_sum - $cost_price;
         $temp_profit = $profit;
@@ -122,6 +121,7 @@ class PaymentController extends Controller
                 'profit' => ($cashier->profit + $profit) - $temp_profit,
             ]);
         }
+
         return ApiResponse::success();
     }
 
@@ -129,7 +129,7 @@ class PaymentController extends Controller
     {
         $from = $request->from;
         $to = $request->to;
-        if (!$from or !$to) {
+        if (! $from or ! $to) {
             return ApiResponse::error('from and to required', 422);
         }
         $user_id = $request->user_id;
@@ -169,6 +169,7 @@ class PaymentController extends Controller
                 'paid_time' => $history->paid_time,
             ];
         }
+
         return ApiResponse::success(data: $final);
     }
 }

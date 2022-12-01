@@ -12,27 +12,30 @@ class Cashier extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     protected $casts = ['balance' => 'array'];
 
     public function scopeDate($query, $date = null)
     {
         $date = $date ?? Carbon::today()->format('Y-m-d');
+
         return $query->where('date', $date);
     }
 
     public function scopeSetCashier($query, $date, $currency_id, $sum)
     {
         $cashier = $this->where('date', $date)->first();
-        if (!$cashier) {
+        if (! $cashier) {
             $cashier = $this->create([
                 'date' => $date,
                 'balance' => [
                     [
                         'currency_id' => $currency_id,
-                        'sum' => $sum
-                    ]
-                ]
+                        'sum' => $sum,
+                    ],
+                ],
             ]);
+
             return true;
         }
         $exists = false;
@@ -47,7 +50,7 @@ class Cashier extends Model
         if ($exists === false) {
             $balance[] = [
                 'currency_id' => $currency_id,
-                'sum' => $sum
+                'sum' => $sum,
             ];
         }
         $cashier->balance = $balance;

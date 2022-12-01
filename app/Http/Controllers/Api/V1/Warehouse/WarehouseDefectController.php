@@ -14,6 +14,7 @@ class WarehouseDefectController extends Controller
         $basket->update([
             'status' => 'taken',
         ]);
+
         return ApiResponse::success();
     }
 }

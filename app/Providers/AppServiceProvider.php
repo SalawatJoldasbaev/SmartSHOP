@@ -20,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
         Product::class => ProductPolicy::class,
         Employee::class => EmployeePolicy::class,
     ];
+
     /**
      * Register any application services.
      *

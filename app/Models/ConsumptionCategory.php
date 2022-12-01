@@ -11,7 +11,8 @@ class ConsumptionCategory extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     protected $casts = [
-        'name' => 'json'
+        'name' => 'json',
     ];
 }

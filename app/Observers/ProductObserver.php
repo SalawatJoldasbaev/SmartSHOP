@@ -15,7 +15,7 @@ class ProductObserver
      */
     public function creating(Product $product)
     {
-        if (!$product->uuid) {
+        if (! $product->uuid) {
             $uuid = Str::uuid();
             $check = Product::where('uuid', $uuid)->first();
             while ($check) {

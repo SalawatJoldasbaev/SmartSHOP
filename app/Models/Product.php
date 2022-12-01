@@ -12,6 +12,7 @@ class Product extends Model
     use SoftDeletes;
 
     protected $guarded = ['id'];
+
     protected $casts = [
         'whole_price' => 'array',
         'max_price' => 'array',
@@ -19,6 +20,7 @@ class Product extends Model
         'cost_price' => 'array',
         'deleted_at' => 'datetime:Y-m-d H:i:s',
     ];
+
     public function category()
     {
         return $this->belongsTo(Category::class);

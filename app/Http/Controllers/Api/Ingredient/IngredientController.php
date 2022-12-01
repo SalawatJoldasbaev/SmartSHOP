@@ -15,20 +15,20 @@ class IngredientController extends Controller
     public function create(IngredientCreateRequest $request)
     {
         $ingredient = Ingredient::create([
-            'name'=> $request->name,
-            'unit_id'=> $request->unit_id,
+            'name' => $request->name,
+            'unit_id' => $request->unit_id,
         ]);
 
         return ApiResponse::data(payload:[
-            'id'=> $ingredient->id,
+            'id' => $ingredient->id,
         ]);
     }
 
     public function update(IngredientUpdateRequest $request, Ingredient $ingredient)
     {
         $ingredient->update([
-            'name'=> $request->name,
-            'unit_id'=> $request->unit_id,
+            'name' => $request->name,
+            'unit_id' => $request->unit_id,
         ]);
 
         return ApiResponse::success();
@@ -37,8 +37,9 @@ class IngredientController extends Controller
     public function delete(Request $request, Ingredient $ingredient)
     {
         $ingredientWarehouse = IngredientProduct::where('ingredient_id', $ingredient->id)->first();
-        if (!$ingredientWarehouse) {
+        if (! $ingredientWarehouse) {
             $ingredient->delete();
+
             return ApiResponse::success();
         } else {
             return ApiResponse::error('not deleted', 409);
@@ -48,6 +49,7 @@ class IngredientController extends Controller
     public function index(Request $request)
     {
         $ingredient = Ingredient::all(['id', 'name', 'unit_id'])->toArray();
+
         return ApiResponse::data(payload:$ingredient);
     }
 }

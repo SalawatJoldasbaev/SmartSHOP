@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use App\Http\Controllers\Api\V1\ApiResponse;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ConsumptionSetRequest extends FormRequest
 {
@@ -33,7 +33,7 @@ class ConsumptionSetRequest extends FormRequest
             'description' => 'required|max:255',
             'type' => 'required',
             'payment_type' => 'required',
-            'whom' => 'required'
+            'whom' => 'required',
         ];
     }
 

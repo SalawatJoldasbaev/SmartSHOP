@@ -15,6 +15,7 @@ class Employee extends Authenticatable
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     protected $casts = [
         'active' => 'boolean',
     ];

@@ -22,7 +22,7 @@ class WarehouseToBranchController extends Controller
         $warehouses = Warehouse::active()->where('branch_id', $employee->branch_id)->get()->collect();
         foreach ($request->products as $product) {
             $warehouse = $warehouses->where('product_id', $product['product_id'])?->first();
-            if (!$warehouse or $warehouse->count - $product['count'] < 0) {
+            if (! $warehouse or $warehouse->count - $product['count'] < 0) {
                 return ApiResponse::error('product not enough', 400);
             }
         }
@@ -45,6 +45,7 @@ class WarehouseToBranchController extends Controller
                 'count' => $product['count'],
             ]);
         }
+
         return ApiResponse::success('success');
     }
 
@@ -60,7 +61,6 @@ class WarehouseToBranchController extends Controller
         $orders = WarehouseOrder::where('warehouse_basket_id', $basket->id)->get();
         $date = Carbon::today()->format('Y-m-d');
         foreach ($orders as $order) {
-
             $branchWarehouse = Warehouse::where('active', true)->where('branch_id', $basket->branch_id)->where('product_id', $order->product_id)->first();
             $branchWarehouse->count -= $order->count;
             $branchWarehouse->save();
@@ -87,6 +87,7 @@ class WarehouseToBranchController extends Controller
         }
         $basket->status = 'taken';
         $basket->save();
+
         return ApiResponse::success('success');
     }
 }

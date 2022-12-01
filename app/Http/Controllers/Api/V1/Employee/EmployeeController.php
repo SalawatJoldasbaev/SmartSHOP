@@ -12,15 +12,14 @@ use Illuminate\Support\Facades\Validator;
 
 class EmployeeController extends Controller
 {
-
     public function index(Request $request)
     {
         $branches = Branch::all()->collect();
         $employees = Employee::when($request->branch_id, function ($query, $branch_id) {
             return $query->where('branch_id', $branch_id);
         })->when($request->search, function ($query, $search) {
-            return $query->where('name', 'like', "%" . $search . "%")
-                ->orWhere('phone', 'like', "%" . $search . "%");
+            return $query->where('name', 'like', '%'.$search.'%')
+                ->orWhere('phone', 'like', '%'.$search.'%');
         })
             ->select('id', 'branch_id', 'avatar', 'name', 'phone', 'salary', 'flex', 'active', 'role')->get();
         $final = [];
@@ -34,8 +33,10 @@ class EmployeeController extends Controller
                 ],
             ]);
         }
+
         return ApiResponse::success(data: $final);
     }
+
     public function register(Request $request)
     {
         try {
@@ -84,16 +85,16 @@ class EmployeeController extends Controller
 
         if (isset($phone) and isset($password)) {
             $user = $user->where('phone', $phone)->first();
-            if (!$user or !Hash::check($password, $user->password)) {
+            if (! $user or ! Hash::check($password, $user->password)) {
                 return ApiResponse::message('phone or password incorrect', 401);
             }
-            $token = $user->createToken('web application: ' . $request->header('User-Agent'))->plainTextToken;
+            $token = $user->createToken('web application: '.$request->header('User-Agent'))->plainTextToken;
         } elseif (isset($pincode)) {
             $user = $user->where('pincode', $pincode)->first();
-            if (!$user) {
+            if (! $user) {
                 return ApiResponse::message('pincode not found', 401);
             }
-            $token = $user->createToken('mobile application:' . $request->header('User-Agent'))->plainTextToken;
+            $token = $user->createToken('mobile application:'.$request->header('User-Agent'))->plainTextToken;
         } else {
             return ApiResponse::error('unknown error', 520);
         }
@@ -143,21 +144,23 @@ class EmployeeController extends Controller
             'phone' => $request->phone,
             'role' => $request->role,
         ];
-        if (!is_null($request->password)) {
+        if (! is_null($request->password)) {
             $data['password'] = Hash::make($request->password);
         }
-        if (!is_null($request->pincode)) {
+        if (! is_null($request->pincode)) {
             $data['pincode'] = md5($request->pincode);
         }
 
         $employee->update($data);
+
         return ApiResponse::success();
     }
 
     public function active(Request $request, Employee $employee)
     {
-        $employee->active = !$employee->active;
+        $employee->active = ! $employee->active;
         $employee->save();
+
         return ApiResponse::success();
     }
 }

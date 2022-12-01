@@ -39,6 +39,7 @@ class WarehouseHistoriesController extends Controller
                 'created_at' => $basket->created_at->format('Y-m-d H:i:s'),
             ];
         }
+
         return ApiResponse::success(data:$final);
     }
 
@@ -56,6 +57,7 @@ class WarehouseHistoriesController extends Controller
                 'count' => $order->count,
             ];
         }
+
         return ApiResponse::success(data:$final);
     }
 }

@@ -11,11 +11,13 @@ class WarehouseBasket extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     //protected $casts = [];
     public function employee()
     {
         return $this->belongsTo(Employee::class);
     }
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);

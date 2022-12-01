@@ -11,8 +11,9 @@ class IngredientOrder extends Model
 
     //protected $fillable = ['id'];
     protected $guarded = ['id'];
+
     protected $casts = [
-        'ingredients'=> 'json'
+        'ingredients' => 'json',
     ];
 
     public function Product()

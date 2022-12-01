@@ -40,14 +40,15 @@ class CategoryController extends Controller
 
     public function index(Request $request)
     {
-        $delete = $request->delete == "true" ? true : false;
+        $delete = $request->delete == 'true' ? true : false;
         $categories = Category::select('id', 'name', 'min_percent', 'max_percent', 'whole_percent', 'min_product', 'deleted_at')->orderBy('id');
         if ($delete == true) {
             $categories = $categories->withTrashed();
         }
-        $categories = Search::new ()->add($categories, 'name')
+        $categories = Search::new()->add($categories, 'name')
             ->beginWithWildcard()
             ->search($request->search);
+
         return ApiResponse::success(data:$categories);
     }
 
@@ -66,7 +67,7 @@ class CategoryController extends Controller
             'min_product' => $percents['min_product'],
             'name' => $request->name,
         ];
-        
+
         $products = Product::where('category_id', $request->category_id)->get();
         $usdToUzs = Forex::where('currency_id', 2)->where('to_currency_id', 1)->first();
         foreach ($products as $product) {
@@ -114,6 +115,7 @@ class CategoryController extends Controller
             ]);
         }
         $category = $category->update($data);
+
         return ApiResponse::success();
     }
 
@@ -122,6 +124,7 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->products()->delete();
         $category->delete();
+
         return ApiResponse::success();
     }
 }
