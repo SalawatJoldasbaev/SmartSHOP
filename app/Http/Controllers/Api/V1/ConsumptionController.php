@@ -61,6 +61,7 @@ class ConsumptionController extends Controller
             }
 
             $cashier = Cashier::create([
+                'branch_id' => $request->user()->branch_id,
                 'date' => $today,
                 'balance' => $balance,
                 'profit' => $profit,
@@ -68,6 +69,7 @@ class ConsumptionController extends Controller
         }
         $data = $request->all();
         $data['employee_id'] = $request->user()->id;
+        $data['branch_id'] = $request->user()->branch_id;
         $data['consumption_category_id'] = $request->category_id;
         Consumption::create($data);
 
@@ -79,10 +81,16 @@ class ConsumptionController extends Controller
         $type = $request->type;
         $from = $request->from;
         $to = $request->to;
-        $consumptions = Consumption::whereDate('date', '>=', $from)->whereDate('date', '<=', $to)
+        $consumptions = Consumption::whereDate('date', '>=', $from)
+            ->whereDate('date', '<=', $to)
             ->when($type, function ($query) use ($type) {
                 $query->where('type', $type);
+            })->when($request->branch_id, function ($query, $branch_id) {
+                $query->where('branch_id', $branch_id);
             });
+        if (!$request->branch_id) {
+            $consumptions = $consumptions->where('branch_id', $request->user()->branch_id);
+        }
         $paginate = $consumptions->paginate(50);
         $sum = collect($paginate)['data'];
         $final = [
