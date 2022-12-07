@@ -47,7 +47,11 @@ class OrderController extends Controller
         $warehouses = Warehouse::active()->where('branch_id', $employee->branch_id)->get();
         foreach ($request->orders as $order) {
             $warehouse = $warehouses->where('product_id', $order['product_id'])->first();
-            if (($warehouse->count - $warehouseGivenProducts[$warehouse->product_id]) - $order['count'] < 0) {
+            $countGiven = 0;
+            if (isset($warehouseGivenProducts[$warehouse->product_id])) {
+                $countGiven = $warehouseGivenProducts[$warehouse->product_id];
+            }
+            if (($warehouse->count - $countGiven) - $order['count'] < 0) {
                 return ApiResponse::error('product is not enough', data: [
                     'id' => $order['product_id'],
                     'name' => $warehouse->product->name,
@@ -142,7 +146,7 @@ class OrderController extends Controller
         }
         $date = Carbon::today()->format('Y-m-d');
         $cashier = Cashier::where('branch_id', $employee->branch_id)->date($date)->first();
-        if (! $cashier) {
+        if (!$cashier) {
             $cashier = Cashier::create([
                 'branch_id' => $employee->branch_id,
                 'date' => $date,
